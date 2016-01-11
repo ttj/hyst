@@ -89,7 +89,7 @@ models = {['biology_1', filesep, 'biology_1'],
 %time-driven transitions not currently supported
 };
 
-table_header = 'Name & Type & |Var| & |Loc| & |Trans| & t_{c} & t_{s} \\';
+table_header = ['Name & Type & |Var| & |Loc| & |Trans| & t_{c} & t_{s} \tabularnewline ', sprintf('\n')];
 table_string = table_header;
 
 for i = 1 : length(models)
@@ -120,12 +120,13 @@ for i = 1 : length(models)
     simulationTime = toc;
     
     % latex table string
-    table_row = [filename, ' & ', num2str(out_config.root.variables.size), ...
+    table_row = [filename, ...
         ' & ', 'todo type', ...
+        ' & ', num2str(out_config.root.variables.size), ...
         ' & ', num2str(out_config.root.modes.size), ...
         ' & ', num2str(out_config.root.transitions.size), ...
         ' & ', num2str(conversionTime), ...
-        ' & ', num2str(simulationTime), '\\ \n'];
+        ' & ', num2str(simulationTime), '\tabularnewline  ', sprintf('\n')];
     
     table_string = [table_string, table_row];
     

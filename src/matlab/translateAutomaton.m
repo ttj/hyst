@@ -11,7 +11,7 @@ function translateAutomaton( model, config, options )
     outputVars = java.util.HashMap();
     
     % translate each component normally
-    if isa(config.root.template, 'com.verivital.hyst.ir.network.NetworkComponent')
+    %if isa(config.root.template, 'com.verivital.hyst.ir.network.NetworkComponent')
         componentsMap = config.root.template.children;
         componentsIt = componentsMap.entrySet().iterator();
         idx = 1;
@@ -22,14 +22,14 @@ function translateAutomaton( model, config, options )
                     isAddSignals, inputVars, outputVars);
             idx = idx + 1;
         end
-    elseif isa(config.root.template, 'com.verivital.hyst.ir.base.BaseComponent')
+    %elseif isa(config.root.template, 'com.verivital.hyst.ir.base.BaseComponent')
         % TODO: need to fix models with only base components (e.g., cruise
         % control), as the changes to support networks has broken this.
         %
         %[charts(1), inputVars, outputVars] = ...
         %    addNetworkComponent(model, config.root, options, config, 1, ...
         %        isAddSignals, inputVars, outputVars);
-    end
+    %end
     
     % post-processing: add a scope block and signals if activated
     if (~ isAddSignals)

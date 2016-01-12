@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sspaceex xmlns="http://www-verimag.imag.fr/xml-namespaces/sspaceex" version="0.2" math="SpaceEx">
+  <component id="Ring_modulator_template">
+    <param name="y1" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y2" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y3" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y4" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y5" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y6" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y7" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y8" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y9" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y10" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y11" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y12" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y13" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y14" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y15" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="C" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Cs" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Cp" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Lh" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Ls1" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Ls2" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Ls3" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="gamma" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="R" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Rp" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Rg1" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Rg2" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Rg3" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Ri" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="Rc" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="theta" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="pi" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <location id="1" name="Ring_modulator" x="304.0" y="222.0" width="166.0" height="206.0">
+      <flow>y1' == (1/C) *(y8 - 0.5*y10 + 0.5*y11 + y14 - (1/R)*y1) &amp; y2' ==  (1/C)*(y9 -0.5*y12 + 0.5*y13 + y15 - (1/R)*y2) &amp; y3' == (1/Cs)*(y10 - gamma*(exp(theta*(y3-y5-y7-2*sin(20000*pi*t)))-1) + gamma*(exp(theta*(-y3-y6+y7+ 2*sin(20000*pi*t)))-1)) &amp; y4' == (1/Cs)*(-y11+ gamma*(exp(theta*(-y4+y6-y7-2*sin(20000*pi*t)))-1) + gamma*(exp(theta*(y4+y5+y7+2*sin(20000*pi*t)))-1)) &amp; y5' == (1/Cs)*(y12+ gamma*(exp(theta*(y3-y5-y7-2*sin(20000*pi*t)))-1) - gamma*(exp(theta*(y4+y5+y7+2*sin(20000*pi*t)))-1) ) &amp; y6' == (1/Cs)*(-y13 - gamma*(exp(theta*(-y4+y6-y7-2*sin(20000*pi*t)))-1) + gamma*(exp(theta*(-y3-y6+y7+ 2*sin(20000*pi*t)))-1)) &amp; y7' == (1/Cp)*(-(1/Rp)*y7 + gamma*(exp(theta*(y3-y5-y7-2*sin(20000*pi*t)))-1) + gamma*(exp(theta*(-y4+y6-y7-2*sin(20000*pi*t)))-1) - gamma*(exp(theta*(y4+y5+y7+2*sin(20000*pi*t)))-1) - gamma*(exp(theta*(-y3-y6+y7+ 2*sin(20000*pi*t)))-1) )   &amp; y8' == -(1/Lh)*y1   &amp; y9' == -(1/Lh)*y2 &amp; y10' == (1/Ls2)*(0.5*y1-y3-Rg2*y10) &amp; y11' == (1/Ls3)*(-0.5*y1+y4-Rg3*y11) &amp; y12' == (1/Ls2)*(0.5*y2-y5-Rg2*y12) &amp; y13' == (1/Ls3)*(-0.5*y2+y6-Rg3*y13) &amp; y14' == (1/Ls1)*(-y1 + 0.5*sin(2000*pi*t)) &amp; y15' == (1/Ls1)*(-y2-(Rc+Rg1)*y15) &amp; t' ==1</flow>
+    </location>
+  </component>
+  <component id="system">
+    <param name="y1" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y2" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y3" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y4" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y5" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y6" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y7" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y8" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y9" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y10" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y11" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y12" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y13" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y14" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y15" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="C" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Cs" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Cp" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Lh" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Ls1" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Ls2" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Ls3" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="gamma" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="R" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Rp" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Rg1" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Rg2" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Rg3" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Ri" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="Rc" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="theta" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="pi" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <bind component="Ring_modulator_template" as="Ring_modulator_template_1">
+      <map key="y1">y1</map>
+      <map key="y2">y2</map>
+      <map key="y3">y3</map>
+      <map key="y4">y4</map>
+      <map key="y5">y5</map>
+      <map key="y6">y6</map>
+      <map key="y7">y7</map>
+      <map key="y8">y8</map>
+      <map key="y9">y9</map>
+      <map key="y10">y10</map>
+      <map key="y11">y11</map>
+      <map key="y12">y12</map>
+      <map key="y13">y13</map>
+      <map key="y14">y14</map>
+      <map key="y15">y15</map>
+      <map key="t">t</map>
+      <map key="C">C</map>
+      <map key="Cs">Cs</map>
+      <map key="Cp">Cp</map>
+      <map key="Lh">Lh</map>
+      <map key="Ls1">Ls1</map>
+      <map key="Ls2">Ls2</map>
+      <map key="Ls3">Ls3</map>
+      <map key="gamma">gamma</map>
+      <map key="R">R</map>
+      <map key="Rp">Rp</map>
+      <map key="Rg1">Rg1</map>
+      <map key="Rg2">Rg2</map>
+      <map key="Rg3">Rg3</map>
+      <map key="Ri">Ri</map>
+      <map key="Rc">Rc</map>
+      <map key="theta">theta</map>
+      <map key="pi">pi</map>
+    </bind>
+  </component>
+</sspaceex>
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sspaceex xmlns="http://www-verimag.imag.fr/xml-namespaces/sspaceex" version="0.2" math="SpaceEx">
+  <component id="neuron">
+    <param name="v" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="u" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <location id="1" name="loc1" x="457.0" y="265.0" width="312.0" height="154.0">
+      <invariant>v - 40 + 0.1*u &lt;= 0</invariant>
+      <flow>v' == 0.01*((v + 56)*(v + 42) - u + 300)&amp;
+u' == 0.03*(8*(v + 56) - u)</flow>
+    </location>
+    <transition source="1" target="1">
+      <guard>v - 40 + 0.1*u == 0</guard>
+      <assignment>v := -53 + 0.04*u &amp; u := u + 20</assignment>
+      <labelposition x="-218.0" y="-135.0" width="332.0" height="136.0" />
+      <middlepoint x="27.0" y="-118.0" />
+    </transition>
+  </component>
+  <component id="sys_neuron">
+    <param name="v" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="u" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <bind component="neuron" as="neuron_1" x="371.0" y="286.0">
+      <map key="v">v</map>
+      <map key="u">u</map>
+    </bind>
+  </component>
+</sspaceex>
+

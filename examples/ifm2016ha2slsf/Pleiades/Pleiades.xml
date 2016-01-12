@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sspaceex xmlns="http://www-verimag.imag.fr/xml-namespaces/sspaceex" version="0.2" math="SpaceEx">
+  <component id="Pleiades">
+    <param name="x1" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x2" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x3" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x4" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x5" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x6" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x7" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y1" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y2" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y3" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y4" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y5" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y6" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y7" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x11" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x21" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x31" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x41" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x51" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x61" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x71" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y11" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y21" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y31" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y41" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y51" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y61" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y71" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="stop_time" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <location id="1" name="Pleiades" x="300.0" y="196.0" width="266.0" height="202.0">
+      <invariant>0&lt;=t &amp; t&lt;= stop_time</invariant>
+      <flow>x1' == x11 &amp; x2' ==x21 &amp; x3' ==x31 &amp; x4' ==x41 &amp; x5' ==x51 &amp; x6' ==x61 &amp; x7' ==x71 &amp; y1' ==y11 &amp; y2' == y21 &amp; y3' ==y31 &amp; y4' == y41 &amp; y5' ==y51 &amp; y6' == y61 &amp; y7' ==y71 &amp; x11' == 2*(x2-x1)/((x1-x2)^2+(y1-y2)^2)^(3/2) + 3*(x3-x1)/((x1-x3)^2+(y1-y3)^2)^(3/2)+4*(x4-x1)/((x1-x4)^2+(y1-y4)^2)^(3/2) + 5*(x5-x1)/((x1-x5)^2+(y1-y5)^2)^(3/2) + 6*(x6-x1)/((x1-x6)^2+(y1-y6)^2)^(3/2) + 7*(x7-x1)/((x1-x7)^2+(y1-y7)^2)^(3/2)  &amp; x21' == 1*(x1-x2)/((x1-x2)^2+(y1-y2)^2)^(3/2) + 3*(x3-x2)/((x2-x3)^2+(y2-y3)^2)^(3/2)+4*(x4-x2)/((x2-x4)^2+(y2-y4)^2)^(3/2) + 5*(x5-x2)/((x2-x5)^2+(y2-y5)^2)^(3/2) + 6*(x6-x2)/((x2-x6)^2+(y2-y6)^2)^(3/2) + 7*(x7-x2)/((x2-x7)^2+(y2-y7)^2)^(3/2) &amp; x31' == (2*x2 - 2*x3)/((x2 - x3)^2 + (y2 - y3)^2)^(3/2) - (4*x3 - 4*x4)/((x3 - x4)^2 + (y3 - y4)^2)^(3/2) - (5*x3 - 5*x5)/((x3 - x5)^2 + (y3 - y5)^2)^(3/2) - (6*x3 - 6*x6)/((x3 - x6)^2 + (y3 - y6)^2)^(3/2) - (7*x3 - 7*x7)/((x3 - x7)^2 + (y3 - y7)^2)^(3/2) + (x1 - x3)/((x1 - x3)^2 + (y1 - y3)^2)^(3/2) &amp; x41' == (2*x2 - 2*x4)/((x2 - x4)^2 + (y2 - y4)^2)^(3/2) + (3*x3 - 3*x4)/((x3 - x4)^2 + (y3 - y4)^2)^(3/2) - (5*x4 - 5*x5)/((x4 - x5)^2 + (y4 - y5)^2)^(3/2) - (6*x4 - 6*x6)/((x4 - x6)^2 + (y4 - y6)^2)^(3/2) - (7*x4 - 7*x7)/((x4 - x7)^2 + (y4 - y7)^2)^(3/2) + (x1 - x4)/((x1 - x4)^2 + (y1 - y4)^2)^(3/2) &amp; x51' == (2*x2 - 2*x5)/((x2 - x5)^2 + (y2 - y5)^2)^(3/2) + (3*x3 - 3*x5)/((x3 - x5)^2 + (y3 - y5)^2)^(3/2) + (4*x4 - 4*x5)/((x4 - x5)^2 + (y4 - y5)^2)^(3/2) - (6*x5 - 6*x6)/((x5 - x6)^2 + (y5 - y6)^2)^(3/2) - (7*x5 - 7*x7)/((x5 - x7)^2 + (y5 - y7)^2)^(3/2) + (x1 - x5)/((x1 - x5)^2 + (y1 - y5)^2)^(3/2) &amp; x61' == (2*x2 - 2*x6)/((x2 - x6)^2 + (y2 - y6)^2)^(3/2) + (3*x3 - 3*x6)/((x3 - x6)^2 + (y3 - y6)^2)^(3/2) + (4*x4 - 4*x6)/((x4 - x6)^2 + (y4 - y6)^2)^(3/2) + (5*x5 - 5*x6)/((x5 - x6)^2 + (y5 - y6)^2)^(3/2) - (7*x6 - 7*x7)/((x6 - x7)^2 + (y6 - y7)^2)^(3/2) + (x1 - x6)/((x1 - x6)^2 + (y1 - y6)^2)^(3/2) &amp; x71' == (2*x2 - 2*x7)/((x2 - x7)^2 + (y2 - y7)^2)^(3/2) + (3*x3 - 3*x7)/((x3 - x7)^2 + (y3 - y7)^2)^(3/2) + (4*x4 - 4*x7)/((x4 - x7)^2 + (y4 - y7)^2)^(3/2) + (5*x5 - 5*x7)/((x5 - x7)^2 + (y5 - y7)^2)^(3/2) + (6*x6 - 6*x7)/((x6 - x7)^2 + (y6 - y7)^2)^(3/2) + (x1 - x7)/((x1 - x7)^2 + (y1 - y7)^2)^(3/2) &amp; y11' == - (2*y1 - 2*y2)/((x1 - x2)^2 + (y1 - y2)^2)^(3/2) - (3*y1 - 3*y3)/((x1 - x3)^2 + (y1 - y3)^2)^(3/2) - (4*y1 - 4*y4)/((x1 - x4)^2 + (y1 - y4)^2)^(3/2) - (5*y1 - 5*y5)/((x1 - x5)^2 + (y1 - y5)^2)^(3/2) - (6*y1 - 6*y6)/((x1 - x6)^2 + (y1 - y6)^2)^(3/2) - (7*y1 - 7*y7)/((x1 - x7)^2 + (y1 - y7)^2)^(3/2) &amp; y21' == (y1 - y2)/((x1 - x2)^2 + (y1 - y2)^2)^(3/2) - (4*y2 - 4*y4)/((x2 - x4)^2 + (y2 - y4)^2)^(3/2) - (5*y2 - 5*y5)/((x2 - x5)^2 + (y2 - y5)^2)^(3/2) - (6*y2 - 6*y6)/((x2 - x6)^2 + (y2 - y6)^2)^(3/2) - (7*y2 - 7*y7)/((x2 - x7)^2 + (y2 - y7)^2)^(3/2) - (3*y2 - 3*y3)/((x2 - x3)^2 + (y2 - y3)^2)^(3/2) &amp; y31' == (2*y2 - 2*y3)/((x2 - x3)^2 + (y2 - y3)^2)^(3/2) - (4*y3 - 4*y4)/((x3 - x4)^2 + (y3 - y4)^2)^(3/2) - (5*y3 - 5*y5)/((x3 - x5)^2 + (y3 - y5)^2)^(3/2) - (6*y3 - 6*y6)/((x3 - x6)^2 + (y3 - y6)^2)^(3/2) - (7*y3 - 7*y7)/((x3 - x7)^2 + (y3 - y7)^2)^(3/2) + (y1 - y3)/((x1 - x3)^2 + (y1 - y3)^2)^(3/2) &amp; y41' == (2*y2 - 2*y4)/((x2 - x4)^2 + (y2 - y4)^2)^(3/2) + (3*y3 - 3*y4)/((x3 - x4)^2 + (y3 - y4)^2)^(3/2) - (5*y4 - 5*y5)/((x4 - x5)^2 + (y4 - y5)^2)^(3/2) - (6*y4 - 6*y6)/((x4 - x6)^2 + (y4 - y6)^2)^(3/2) - (7*y4 - 7*y7)/((x4 - x7)^2 + (y4 - y7)^2)^(3/2) + (y1 - y4)/((x1 - x4)^2 + (y1 - y4)^2)^(3/2) &amp; y51' == (2*y2 - 2*y5)/((x2 - x5)^2 + (y2 - y5)^2)^(3/2) + (3*y3 - 3*y5)/((x3 - x5)^2 + (y3 - y5)^2)^(3/2) + (4*y4 - 4*y5)/((x4 - x5)^2 + (y4 - y5)^2)^(3/2) - (6*y5 - 6*y6)/((x5 - x6)^2 + (y5 - y6)^2)^(3/2) - (7*y5 - 7*y7)/((x5 - x7)^2 + (y5 - y7)^2)^(3/2) + (y1 - y5)/((x1 - x5)^2 + (y1 - y5)^2)^(3/2) &amp; y61' == (2*y2 - 2*y6)/((x2 - x6)^2 + (y2 - y6)^2)^(3/2) + (3*y3 - 3*y6)/((x3 - x6)^2 + (y3 - y6)^2)^(3/2) + (4*y4 - 4*y6)/((x4 - x6)^2 + (y4 - y6)^2)^(3/2) + (5*y5 - 5*y6)/((x5 - x6)^2 + (y5 - y6)^2)^(3/2) - (7*y6 - 7*y7)/((x6 - x7)^2 + (y6 - y7)^2)^(3/2) + (y1 - y6)/((x1 - x6)^2 + (y1 - y6)^2)^(3/2) &amp; y71' == (2*y2 - 2*y7)/((x2 - x7)^2 + (y2 - y7)^2)^(3/2) + (3*y3 - 3*y7)/((x3 - x7)^2 + (y3 - y7)^2)^(3/2) + (4*y4 - 4*y7)/((x4 - x7)^2 + (y4 - y7)^2)^(3/2) + (5*y5 - 5*y7)/((x5 - x7)^2 + (y5 - y7)^2)^(3/2) + (6*y6 - 6*y7)/((x6 - x7)^2 + (y6 - y7)^2)^(3/2) + (y1 - y7)/((x1 - x7)^2 + (y1 - y7)^2)^(3/2) &amp; t' ==1</flow>
+    </location>
+  </component>
+  <component id="system">
+    <param name="x1" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x2" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x3" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x4" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x5" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x6" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x7" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y1" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y2" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y3" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y4" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y5" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y6" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y7" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x11" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x21" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x31" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x41" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x51" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x61" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x71" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y11" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y21" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y31" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y41" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y51" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y61" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y71" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="stop_time" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <bind component="Pleiades" as="Pleiades_1" x="818.0" y="1.0">
+      <map key="x1">x1</map>
+      <map key="x2">x2</map>
+      <map key="x3">x3</map>
+      <map key="x4">x4</map>
+      <map key="x5">x5</map>
+      <map key="x6">x6</map>
+      <map key="x7">x7</map>
+      <map key="y1">y1</map>
+      <map key="y2">y2</map>
+      <map key="y3">y3</map>
+      <map key="y4">y4</map>
+      <map key="y5">y5</map>
+      <map key="y6">y6</map>
+      <map key="y7">y7</map>
+      <map key="x11">x11</map>
+      <map key="x21">x21</map>
+      <map key="x31">x31</map>
+      <map key="x41">x41</map>
+      <map key="x51">x51</map>
+      <map key="x61">x61</map>
+      <map key="x71">x71</map>
+      <map key="y11">y11</map>
+      <map key="y21">y21</map>
+      <map key="y31">y31</map>
+      <map key="y41">y41</map>
+      <map key="y51">y51</map>
+      <map key="y61">y61</map>
+      <map key="y71">y71</map>
+      <map key="t">t</map>
+      <map key="stop_time">stop_time</map>
+    </bind>
+  </component>
+</sspaceex>
+

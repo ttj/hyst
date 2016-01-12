@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sspaceex xmlns="http://www-verimag.imag.fr/xml-namespaces/sspaceex" version="0.2" math="SpaceEx">
+  <component id="integrator">
+    <param name="x1" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x2" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x3" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <location id="1" name="loc1" x="175.0" y="194.0" width="158.0" height="122.0">
+      <invariant>x1^2 + x2^2 - x3 &lt;= 0</invariant>
+      <flow>x1' == 1 &amp;
+ x2' == 1 &amp;
+ x3' ==  x1 -  x2</flow>
+    </location>
+    <location id="2" name="loc2" x="621.0" y="192.0" width="280.0" height="118.0">
+      <flow>x1' == -x1 + (2*x2*x3) / (x1^2 + x2^2) &amp;
+ x2' == -x2 + (2*x1*x3) / (x1^2 + x2^2) &amp;
+ x3' ==  -2*x2</flow>
+    </location>
+    <transition source="1" target="2">
+      <guard>x1^2 + x2^2 - x3 == 0</guard>
+      <labelposition x="-68.0" y="-118.0" width="204.0" height="102.0" />
+      <middlepoint x="358.0" y="152.0" />
+    </transition>
+  </component>
+  <component id="sys_integrator">
+    <param name="x1" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x2" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x3" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <bind component="integrator" as="integrator_1" x="347.0" y="193.0">
+      <map key="x1">x1</map>
+      <map key="x2">x2</map>
+      <map key="x3">x3</map>
+    </bind>
+  </component>
+</sspaceex>
+

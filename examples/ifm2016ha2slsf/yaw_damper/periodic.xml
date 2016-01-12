@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sspaceex xmlns="http://www-verimag.imag.fr/xml-namespaces/sspaceex" version="0.2" math="SpaceEx">
+  <component id="init">
+    <note>x1' == -.0558*x1 -.9968*x2 + .0802*x3 + .0415*x4 + .00729 * u1 + .00729 * (2.34 * x2 - 2.34 * 0.2 * x5) &amp;&amp;
+x2' == .598*x1 -.115*x2 -.0318*x3 -0.475 *u1 -0.475 * (2.34 * x2 - 2.34 * 0.2 * x5) + 0.00775 * u2 &amp;&amp;
+x3' == -3.05*x1 + .388*x2 -.4650*x3 + 0.153 * u1 + 0.153 * (2.34 * x2 - 2.34 * 0.2 * x5) + 0.143* u2 &amp;&amp;
+x4' == 0.0805*x2+ x3 &amp;&amp;
+x5' == x2 -0.2*x5 &amp;&amp;
+c' == 1</note>
+    <param name="x1" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x2" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x3" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x4" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="x5" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="u1" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="false" />
+    <param name="u2" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="false" />
+    <param name="u1_hold" type="real" local="true" d1="1" d2="1" dynamics="any" />
+    <param name="c" type="real" local="true" d1="1" d2="1" dynamics="any" />
+    <location id="1" name="flying_before" x="430.0" y="341.0" width="318.0" height="198.0">
+      <invariant>c &lt;= 0.1</invariant>
+      <flow>x1' == -.0558*x1 -.9968*x2 + .0802*x3 + .0415*x4 + .00729 * u1 + .00729 * (u1_hold) &amp;&amp;
+x2' == .598*x1 -.115*x2 -.0318*x3 -0.475 *u1 -0.475 * (u1_hold) + 0.00775 * u2 &amp;&amp;
+x3' == -3.05*x1 + .388*x2 -.4650*x3 + 0.153 * u1 + 0.153 * (u1_hold) + 0.143* u2 &amp;&amp;
+x4' == 0.0805*x2+ x3 &amp;&amp;
+x5' == x2 -0.2*x5 &amp;&amp;
+u1_hold' == 0 &amp;&amp;
+c' == 1</flow>
+    </location>
+    <location id="2" name="flying_after" x="902.0" y="339.0" width="266.0" height="188.0">
+      <invariant>c &lt;= 0.1</invariant>
+      <flow>x1' == -.0558*x1 -.9968*x2 + .0802*x3 + .0415*x4 + .00729 * u1 + .00729 * (u1_hold) &amp;&amp;
+x2' == .598*x1 -.115*x2 -.0318*x3 -0.475 *u1 -0.475 * (u1_hold) + 0.00775 * u2 &amp;&amp;
+x3' == -3.05*x1 + .388*x2 -.4650*x3 + 0.153 * u1 + 0.153 * (u1_hold) + 0.143* u2 &amp;&amp;
+x4' == 0.0805*x2+ x3 &amp;&amp;
+x5' == x2 -0.2*x5 &amp;&amp;
+u1_hold' == 0 &amp;&amp;
+c' == 1</flow>
+    </location>
+    <transition source="2" target="1">
+      <guard>c == 0.1</guard>
+      <assignment>c := 0</assignment>
+      <labelposition x="-61.0" y="8.0" width="112.0" height="56.0" />
+      <middlepoint x="688.0" y="487.0" />
+    </transition>
+    <transition source="1" target="2">
+      <assignment>u1_hold := 2.34 * x2 - 2.34 * 0.2 * x5</assignment>
+      <labelposition x="-126.0" y="-104.0" width="244.0" height="80.0" />
+      <middlepoint x="679.0" y="215.0" />
+    </transition>
+  </component>
+  <component id="timer">
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="tmax" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <location id="1" name="ticking" x="275.0" y="104.0">
+      <invariant>t &lt;= tmax</invariant>
+      <flow>t' == 1</flow>
+    </location>
+  </component>
+  <component id="input_generator">
+    <param name="u1" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="u2" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="false" />
+    <location id="1" name="impulse" x="272.0" y="121.0" width="134.0" height="104.0">
+      <invariant>t &lt;= 0.01</invariant>
+      <flow>u1' == 0 &amp;&amp;
+u2' == 0</flow>
+    </location>
+    <location id="2" name="off" x="736.0" y="121.0">
+      <flow>u1' == 0 &amp;&amp;
+u2' == 0</flow>
+    </location>
+    <transition source="1" target="2" timedriven="true">
+      <guard>t &gt;= 0.01</guard>
+      <assignment>u1 := 0 &amp;&amp; u2 := 0</assignment>
+      <labelposition x="-50.0" y="-13.0" width="150.0" height="76.0" />
+    </transition>
+  </component>
+  <component id="error_checker">
+    <param name="x1" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="false" />
+    <param name="x2" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="false" />
+    <param name="x3" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="false" />
+    <param name="x4" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="false" />
+    <location id="1" name="noerror" x="301.0" y="167.0" />
+    <location id="2" name="error" x="596.0" y="168.0" />
+    <transition source="1" target="2">
+      <guard>x2 &lt;= -4</guard>
+      <labelposition x="-18.0" y="0.0" width="86.0" height="50.0" />
+    </transition>
+  </component>
+  <component id="controller">
+    <param name="yaw" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="false" />
+    <param name="z" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="false" />
+    <param name="yaw_controller" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <location id="1" name="none" x="415.0" y="119.0" width="204.0" height="112.0">
+      <invariant>yaw_controller == 0</invariant>
+    </location>
+    <location id="2" name="compensator" x="411.0" y="262.0" width="186.0" height="112.0">
+      <invariant>yaw_controller == 2.85 * yaw</invariant>
+    </location>
+    <location id="3" name="washout" x="417.0" y="407.0" width="292.0" height="106.0">
+      <note>yaw_controller == (2.34 * x2 - 2.34 * 0.2 * x5)</note>
+      <invariant>yaw_controller == 2.34 * yaw - 2.34 * 0.2 * z</invariant>
+    </location>
+  </component>
+  <component id="network">
+    <param name="x1" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x2" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x3" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x4" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="x5" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="u1" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="u2" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="tmax" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <bind component="init" as="init_1" x="451.0" y="53.0">
+      <map key="x1">x1</map>
+      <map key="x2">x2</map>
+      <map key="x3">x3</map>
+      <map key="x4">x4</map>
+      <map key="x5">x5</map>
+      <map key="u1">u1</map>
+      <map key="u2">u2</map>
+    </bind>
+    <bind component="timer" as="timer_1" x="468.0" y="297.0">
+      <map key="t">t</map>
+      <map key="tmax">tmax</map>
+    </bind>
+    <bind component="input_generator" as="input_generator_1" x="463.0" y="448.0">
+      <map key="u1">u1</map>
+      <map key="u2">u2</map>
+      <map key="t">t</map>
+    </bind>
+  </component>
+</sspaceex>
+

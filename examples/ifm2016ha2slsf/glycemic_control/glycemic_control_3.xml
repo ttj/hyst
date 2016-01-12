@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sspaceex xmlns="http://www-verimag.imag.fr/xml-namespaces/sspaceex" version="0.2" math="SpaceEx">
+  <component id="glycemic">
+    <param name="G" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="X" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="I" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <location id="2" name="loc1" x="240.0" y="218.0" width="316.0" height="174.0">
+      <invariant>t &lt;= 180</invariant>
+      <flow>G' == - X*(G + 4.5) + 0.5*exp(-0.05 * t) &amp;
+X' == -0.025*X + 0.013*I &amp;
+I' == -0.093*(I + 0.015) + 0.00138889*G*(0.41 - 0.0094*G) &amp; t' == 1</flow>
+    </location>
+    <location id="1" name="loc2" x="621.0" y="218.0" width="324.0" height="172.0">
+      <invariant>180 &lt;=  t &lt;= 720</invariant>
+      <flow>G' == - X*(G + 4.5) + 0.5*exp(-0.05 * t) &amp;
+X' ==-0.025*X + 0.013*I &amp;
+I' ==-0.093*(I + 0.015) + 4.5*0.0001395*(1 + 0.222222*G) &amp; t' == 1</flow>
+    </location>
+    <transition source="2" target="1">
+      <guard>t == 180</guard>
+      <labelposition x="-91.0" y="-111.0" width="260.0" height="96.0" />
+      <middlepoint x="418.5" y="129.0" />
+    </transition>
+  </component>
+  <component id="sys_glycemic">
+    <param name="G" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="X" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="I" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="tl" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <bind component="glycemic" as="glycemic_1" x="355.0" y="236.0">
+      <map key="G">G</map>
+      <map key="X">X</map>
+      <map key="I">I</map>
+      <map key="t">t</map>
+    </bind>
+  </component>
+</sspaceex>
+

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sspaceex xmlns="http://www-verimag.imag.fr/xml-namespaces/sspaceex" version="0.2" math="SpaceEx">
+  <component id="poluttion">
+    <param name="y1" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y2" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y3" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y4" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y5" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y6" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y7" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y8" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y9" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y10" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y11" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y12" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y13" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y14" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y15" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y16" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y17" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y18" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y19" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="y20" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="k1" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k2" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k3" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k4" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k5" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k6" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k7" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k8" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k9" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k10" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k11" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k12" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k13" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k14" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k15" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k16" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k17" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k18" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k19" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k20" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k21" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k22" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k23" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k24" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="k25" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" />
+    <param name="stop_time" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <location id="1" name="pollution" x="304.0" y="222.0" width="166.0" height="206.0">
+      <invariant>0&lt;=t &amp; t &lt;=stop_time</invariant>
+      <flow>y1' == -k1*y1 - k10*y11*y1 - k14*y1*y6 - k23*y1*y4 - k24*y19*y1 + k2*y2*y4 + k3*y5*y2 + k9*y11*y2 + k11*y13 + k12*y10*y2 + k22*y19 + k25*y20 &amp; y2' == -k2*y2*y4 - k3*y5*y2 - k9*y11*y2 - k12*y10*y2 + k1*y1 + k21*y19 &amp; y3' == -k15*y3 + k1*y1 + k17*y4 + k19*y16 + k22*y19 &amp; y4' == -k2*y2*y4 - k16*y4 -k17*y4 -k23*y1*y4 +k15*y3 &amp; y5' == -k3*y5*y2 + 2*k4*y7 + k6*y7*y6 + k7*y9 + k13*y14 + k20*y17*y6  &amp; y6' == -k6*y7*y6 - k8*y9*y6 - k14*y1*y6 - k20*y17*y6 + k3*y5*y2 + 2*k18*y16 &amp; y7' == -k4*y7 -k5*y7 - k6*y7*y6 + k13*y14 &amp; y8' == k4*y7 + k5*y7 + k6*y7*y6 + k7*y9 &amp; y9' == -k7*y9 - k8*y9*y6 &amp; y10' == -k12*y10*y2 + k7*y9 +k9*y11*y2 &amp; y11' == -k9*y11*y2 - k10*y11*y1 + k8*y9*y6 + k11*y13 &amp; y12' == k9*y11*y2 &amp; y13' == -k11*y13 + k10*y11*y1 &amp; y14' == -k13*y14 + k12*y10*y2 &amp; y15' == k14*y1*y6 &amp; y16' == -k18*y16 - k19*y16 + k16*y4 &amp; y17' == -k20*y17*y6 &amp; y18' == k20*y17*y6 &amp; y19' == -k21*y19 - k22*y19 - k24*y19*y1 + k23*y1*y4 + k25*y20 &amp; y20' == -k25*y20 + k24*y19*y1 &amp; t' == 1</flow>
+    </location>
+  </component>
+  <component id="system">
+    <param name="y1" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y2" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y3" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y4" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y5" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y6" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y7" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y8" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y9" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y10" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y11" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y12" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y13" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y14" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y15" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y16" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y17" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y18" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y19" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="y20" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="k1" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k2" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k3" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k4" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k5" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k6" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k7" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k8" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k9" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k10" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k11" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k12" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k13" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k14" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k15" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k16" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k17" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k18" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k19" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k20" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k21" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k22" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k23" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k24" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="k25" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="stop_time" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <bind component="poluttion" as="poluttion_1" x="667.0" y="38.0">
+      <map key="y1">y1</map>
+      <map key="y2">y2</map>
+      <map key="y3">y3</map>
+      <map key="y4">y4</map>
+      <map key="y5">y5</map>
+      <map key="y6">y6</map>
+      <map key="y7">y7</map>
+      <map key="y8">y8</map>
+      <map key="y9">y9</map>
+      <map key="y10">y10</map>
+      <map key="y11">y11</map>
+      <map key="y12">y12</map>
+      <map key="y13">y13</map>
+      <map key="y14">y14</map>
+      <map key="y15">y15</map>
+      <map key="y16">y16</map>
+      <map key="y17">y17</map>
+      <map key="y18">y18</map>
+      <map key="y19">y19</map>
+      <map key="y20">y20</map>
+      <map key="k1">k1</map>
+      <map key="k2">k2</map>
+      <map key="k3">k3</map>
+      <map key="k4">k4</map>
+      <map key="k5">k5</map>
+      <map key="k6">k6</map>
+      <map key="k7">k7</map>
+      <map key="k8">k8</map>
+      <map key="k9">k9</map>
+      <map key="k10">k10</map>
+      <map key="k11">k11</map>
+      <map key="k12">k12</map>
+      <map key="k13">k13</map>
+      <map key="k14">k14</map>
+      <map key="k15">k15</map>
+      <map key="k16">k16</map>
+      <map key="k17">k17</map>
+      <map key="k18">k18</map>
+      <map key="k19">k19</map>
+      <map key="k20">k20</map>
+      <map key="k21">k21</map>
+      <map key="k22">k22</map>
+      <map key="k23">k23</map>
+      <map key="k24">k24</map>
+      <map key="k25">k25</map>
+      <map key="t">t</map>
+      <map key="stop_time">stop_time</map>
+    </bind>
+  </component>
+</sspaceex>
+

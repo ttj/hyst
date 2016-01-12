@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sspaceex xmlns="http://www-verimag.imag.fr/xml-namespaces/sspaceex" version="0.2" math="SpaceEx">
+  <component id="platoon">
+    <param name="e1" real="e1" local="false" d1="1" d2="1" dynamics="any" type="real" />
+    <param name="e1prime" real="e1prime" local="false" d1="1" d2="1" dynamics="any" type="real" />
+    <param name="a1" real="a1" local="false" d1="1" d2="1" dynamics="any" type="real" />
+    <param name="e2" real="e2" local="false" d1="1" d2="1" dynamics="any" type="real" />
+    <param name="e2prime" real="e2prime" local="false" d1="1" d2="1" dynamics="any" type="real" />
+    <param name="a2" real="a2" local="false" d1="1" d2="1" dynamics="any" type="real" />
+    <param name="e3" real="e3" local="false" d1="1" d2="1" dynamics="any" type="real" />
+    <param name="e3prime" real="e3prime" local="false" d1="1" d2="1" dynamics="any" type="real" />
+    <param name="a3" real="a3" local="false" d1="1" d2="1" dynamics="any" type="real" />
+    <param name="aL" real="aL" local="false" d1="1" d2="1" dynamics="any" type="real" />
+    <param name="t" real="t" local="false" d1="1" d2="1" dynamics="any" type="real" />
+    <param name="c1" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <param name="c2" type="real" local="false" d1="1" d2="1" dynamics="const" />
+    <location id="1" name="ok" x="661.0" y="222.0" width="930.0" height="246.0">
+      <invariant>aL==0 &amp;  t &lt;= 2</invariant>
+      <flow>aL' == 0 &amp; e1' == e1prime &amp;
+		e1prime' == -a1 + aL&amp;
+		a1' == 1.605*e1 + 4.868*e1prime - 3.5754*a1 - 0.8198*e2 + 0.427*e2prime - 0.045*a2 - 0.1942*e3 + 0.3626*e3prime - 0.0946*a3 &amp;
+		e2' == e2prime &amp;
+		e2prime' == a1 - a2 &amp;
+		a2' == 0.8718*e1 + 3.814*e1prime - 0.0754*a1 + 1.1936*e2 + 3.6258*e2prime - 3.2396*a2 - 0.595*e3 + 0.1294*e3prime - 0.0796*a3 &amp;
+		e3' == e3prime &amp;
+		e3prime' == a2 - a3 &amp;
+		a3' == 0.7132*e1 + 3.573*e1prime - 0.0964*a1 + 0.8472*e2 + 3.2568*e2prime - 0.0876*a2 + 1.2726*e3 + 3.072*e3prime - 3.1356*a3 &amp;
+    t' == 1</flow>
+    </location>
+    <location id="2" name="corrupt" x="650.0" y="577.0" width="874.0" height="196.0">
+      <invariant>aL==0 &amp;  t &lt;= 2</invariant>
+      <flow>aL' == 0 &amp; e1' == e1prime &amp;
+    	e1prime' == -a1 + aL &amp;
+    	a1' == 1.605*e1 + 4.868*e1prime - 3.5754*a1 &amp;
+    	e2' == e2prime &amp;
+    	e2prime' == a1 - a2 &amp;
+    	a2' == 1.1936*e2 + 3.6258*e2prime - 3.2396*a2 &amp;
+    	e3' == e3prime &amp;
+    	e3prime' == a2 - a3 &amp;
+    	a3' == 0.7132*e1 + 3.573*e1prime - 0.0964*a1 + 0.8472*e2 + 3.2568*e2prime - 0.0876*a2 + 1.2726*e3 + 3.072*e3prime - 3.1356*a3 &amp;
+      t' == 1</flow>
+    </location>
+    <transition source="1" target="2">
+      <guard>t &gt;= c1</guard>
+      <assignment>t := 0</assignment>
+      <labelposition x="145.0" y="-13.0" width="122.0" height="84.0" />
+      <middlepoint x="727.5" y="380.5" />
+    </transition>
+    <transition source="2" target="1">
+      <guard>t &gt;= c2</guard>
+      <assignment>t := 0</assignment>
+      <labelposition x="-107.0" y="-23.0" width="108.0" height="84.0" />
+      <middlepoint x="599.5" y="378.5" />
+    </transition>
+  </component>
+  <component id="system">
+    <param name="e1" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="e1prime" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="a1" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="e2" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="e2prime" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="a2" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="e3" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="e3prime" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="a3" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="aL" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="t" type="real" local="false" d1="1" d2="1" dynamics="any" controlled="true" />
+    <param name="c1" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <param name="c2" type="real" local="false" d1="1" d2="1" dynamics="const" controlled="true" />
+    <bind component="platoon" as="platoon_1" x="552.0" y="299.0">
+      <map key="e1">e1</map>
+      <map key="e1prime">e1prime</map>
+      <map key="a1">a1</map>
+      <map key="e2">e2</map>
+      <map key="e2prime">e2prime</map>
+      <map key="a2">a2</map>
+      <map key="e3">e3</map>
+      <map key="e3prime">e3prime</map>
+      <map key="a3">a3</map>
+      <map key="aL">aL</map>
+      <map key="t">t</map>
+      <map key="c1">c1</map>
+      <map key="c2">c2</map>
+    </bind>
+  </component>
+  /&gt;
+</sspaceex>
+

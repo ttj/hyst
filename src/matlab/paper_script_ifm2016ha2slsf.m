@@ -24,7 +24,7 @@ models = {...
 %<root>: Variables with defined flows in mode 'rod_1' ([x, c1, c2])
 %differ from mode 'shutdown' ([])
 %
-%['yaw_damper', filesep, 'continuized'], % network broken:
+['yaw_damper', filesep, 'continuized'], % network broken:
 %Java exception occurred:
 %com.verivital.hyst.ir.AutomatonExportException: explicit
 %time-driven transitions not currently supported

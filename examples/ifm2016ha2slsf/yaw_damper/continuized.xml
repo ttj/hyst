@@ -73,7 +73,7 @@ u2' == 0</flow>
       <flow>u1' == 0 &amp;&amp;
 u2' == 0</flow>
     </location>
-    <transition source="1" target="2" timedriven="true">
+    <transition source="1" target="2" timedriven="false">
       <guard>t &gt;= 0.01</guard>
       <assignment>u1 := 0 &amp;&amp; u2 := 0</assignment>
       <labelposition x="-50.0" y="-13.0" width="150.0" height="76.0" />

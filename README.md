@@ -235,9 +235,13 @@ Another basic example is the ShortenModeNamesPass.java ( https://github.com/veri
 
 #### ECLIPSE SETUP:
 
-You need to compile with antlt-4.4-runtime.jar and several others jars (in /lib) on your classpath. In Eclipse, you do this by going to: 
+You need to compile with antlr-4.4-runtime.jar and several others jars (in /lib) on your classpath. In Eclipse, you do this by going to: 
 
 Project -> Properties -> Java Build Path -> Libraries -> Add External Jar -> select the antlt-4.4-complete.jar file (should be in the project directory) -> Ok
+
+#### UBUNTU RIGHT-CLICK CONTEXT MENU FOR TOOL RUNNING:
+
+The right click context menu was done using Nautilus Actions Configuration Tool. If you use the search (top button on the dock) you can find it. Basically, it uses a GUI to allow you to give commands to run, as well as filters for when they're enabled / disabled (for example, SpaceEx Model Editor is only there if you right click a .xml file). There are some system-specific paths in here (the path to the tools, for example).
 
 #### RUNNING DIRECTLY FROM .CLASS FILES:
 
@@ -503,3 +507,65 @@ Themostat system has two locations and one variable
 heater_production(k,2,1)
 E.g if we want to generate 100 examples of thermostat system:
 heater_production(100,2,1)
+
+#### MATLAB TOOLBOXES
+
+For the SpaceEx-to-Simulink/Stateflow (SLSF) translation, we need a variety of toolboxes in Matlab. Likewise, some passes (e.g., order reduction) rely on Matlab, and require certain toolboxes. The list below (attempts) to keep track of the toolbox dependencies in latest versions of Matlab:
+
+##### Definitely needed:
+| Toolbox | Toolbox Version Tested | Matlab Version Tested |
+| -------- | ------ | -------- |
+| MATLAB |                                               Version 8.5 |        (R2015a) |
+| Simulink |                                              Version 8.5 |        (R2015a) |
+| Control System Toolbox |                                Version 9.9 |        (R2015a) |
+| Embedded Coder |                                        Version 6.8 |        (R2015a) |
+| Fuzzy Logic Toolbox |                                   Version 2.2.21 |     (R2015a) |
+| Global Optimization Toolbox |                           Version 3.3.1 |      (R2015a) |
+| MATLAB Coder |                                          Version 2.8 |        (R2015a) |
+| MATLAB Compiler |                                       Version 6.0 |        (R2015a) |
+| MATLAB Compiler SDK |                                   Version 6.0 |        (R2015a) |
+| Model Predictive Control Toolbox |                      Version 5.0.1 |      (R2015a) |
+| Optimization Toolbox |                                  Version 7.2 |        (R2015a) |
+| Parallel Computing Toolbox |                            Version 6.6 |        (R2015a) |
+| Partial Differential Equation Toolbox |                 Version 2.0 |        (R2015a) |
+| Simulink Coder |                                        Version 8.8 |        (R2015a) |
+| Simulink Control Design |                               Version 4.2 |        (R2015a) |
+| Stateflow |                                             Version 8.5 |        (R2015a) |
+| Symbolic Math Toolbox |                                 Version 6.2 |        (R2015a) |
+
+##### Possibly needed/useful:
+| Toolbox | Toolbox Version Tested | Matlab Version Tested |
+| -------- | ------ | -------- |
+| Robust Control Toolbox |                                Version 5.3 |        (R2015a) |
+| System Identification Toolbox |                         Version 9.2 |        (R2015a) |
+
+##### Probably not needed:
+| Toolbox | Toolbox Version Tested | Matlab Version Tested |
+| -------- | ------ | -------- |
+| Aerospace Blockset  |                                    Version 3.15 |       (R2015a) |
+| Aerospace Toolbox |                                    Version 2.15 |       (R2015a) |
+| Bioinformatics Toolbox |                               Version 4.5.1 |      (R2015a) |
+| Communications System Toolbox |                         Version 6.0 |        (R2015a) |
+| Computer Vision System Toolbox |                        Version 6.2 |        (R2015a) |
+| Curve Fitting Toolbox |                                 Version 3.5.1 |      (R2015a) |
+| DSP System Toolbox |                                    Version 9.0 |        (R2015a) |
+| Econometrics Toolbox |                                  Version 3.2 |        (R2015a) |
+| Financial Toolbox |                                     Version 5.5 |        (R2015a) |
+| Fixed-Point Designer |                                  Version 5.0 |        (R2015a) |
+| Image Acquisition Toolbox |                             Version 4.9 |        (R2015a) |
+| Image Processing Toolbox |                              Version 9.2 |        (R2015a) |
+| Instrument Control Toolbox |                            Version 3.7 |        (R2015a) |
+| MATLAB Report Generator  |                              Version 4.1 |        (R2015a) |
+| Mapping Toolbox |                                       Version 4.1 |        (R2015a) |
+| Neural Network Toolbox |                                Version 8.3 |        (R2015a) |
+| Phased Array System Toolbox |                           Version 3.0 |        (R2015a) |
+| Signal Processing Toolbox |                             Version 7.0 |        (R2015a) |
+| SimBiology |                                            Version 5.2 |        (R2015a) |
+| SimElectronics |                                        Version 2.7 |        (R2015a) |
+| SimMechanics |                                          Version 4.6 |        (R2015a) |
+| SimPowerSystems |                                       Version 6.3 |        (R2015a) |
+| Simscape |                                              Version 3.13 |       (R2015a) |
+| Simulink 3D Animation |                                 Version 7.3 |        (R2015a) |
+| Simulink Report Generator |                             Version 4.1 |        (R2015a) |
+| Statistics and Machine Learning Toolbox |               Version 10.0 |       (R2015a) |
+| Wavelet Toolbox |                                       Version 4.14.1 |     (R2015a) |

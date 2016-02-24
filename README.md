@@ -21,6 +21,12 @@ HyST started during a 2014 Visiting Faculty Research Program visit by Taylor to 
 
 Hyst has been tested on Windows 7/8/10 and Linux (Ubuntu) using Java 1.7 and Java 1.8.
 
+#### VIRTUAL MACHINE:
+
+In part for the HSCC 2016 repeatability evaluation, we prepared a virtual machine with Hyst and all supported tools installed.
+
+https://www.dropbox.com/sh/76debyjlxeyz0jv/AADIxc38zdZJCe9LYlc4kZtMa?dl=0
+
 #### GUI USAGE:
 
 Hyst can be run through a GUI or using the command line. To use the GUI, after building Hyst.jar simply run it as an executable .jar file with no arguments:

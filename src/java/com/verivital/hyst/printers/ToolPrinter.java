@@ -4,135 +4,163 @@
 package com.verivital.hyst.printers;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
-import java.util.Map;
+
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
 
 import com.verivital.hyst.ir.AutomatonExportException;
 import com.verivital.hyst.ir.Configuration;
 import com.verivital.hyst.main.Hyst;
 import com.verivital.hyst.main.HystFrame;
+import com.verivital.hyst.util.AutomatonUtil;
+import com.verivital.hyst.util.CmdLineRuntimeException;
 import com.verivital.hyst.util.Preconditions;
-
+import com.verivital.hyst.util.Preconditions.PreconditionsFailedException;
 
 /**
- * A generic tool printer class. Printers for individual tools will override this abstract class. The model is printed by using
- * printConfiguration().
+ * A generic tool printer class. Printers for individual tools will override this abstract class.
+ * The model is printed by using printConfiguration().
  */
-public abstract class ToolPrinter 
+public abstract class ToolPrinter
 {
 	// configuration being printer
 	protected Configuration config;
-	
+
 	// parameters
 	protected String originalFilename = null; // assigned in setParameters
-	protected String baseName = null; // assigned in setParameters from originalFilename
-	protected String outputFilename = null; // assigned in setParameters, can be null
-	private String toolParamsString = null; // assigned in setParameters
-	protected Map <String, String> toolParams = getDefaultParams(); // assigned before printing
-
+	protected String baseName = null; // assigned in setParameters from
+										// originalFilename
+	protected String outputFilename = null; // assigned in setParameters, can be
+											// null
 	// don't need to be modified
 	protected String indentation = "";
-	protected String indentationAmount = "  ";
-	protected String commentChar = getCommentCharacter();
+	protected String indentationAmount = "    ";
+	protected String commentChar = getCommentPrefix();
 	protected String decreaseIndentationString = "}";
-	
-	// checks to do before printing (assign to the preconditions.skip in your ToolPrinter constructor to omit checks)
-	protected Preconditions preconditions = new Preconditions(false); // run all checks by default
-	
+
+	// checks to do before printing (assign to the preconditions.skip in your
+	// ToolPrinter constructor to omit checks)
+	protected Preconditions preconditions = new Preconditions(false); // run all
+																		// checks
+																		// by
+																		// default
+
+	// command line parser for tools
+	private CmdLineParser parser = new CmdLineParser(this);
+
 	// printing
 	public enum OutputType
 	{
-		STDOUT,
-		GUI,
-		FILE,
-		NONE,
-		STRING,
+		STDOUT, GUI, FILE, NONE, STRING,
 	};
-	
-	public void setConfig(Configuration c) {
+
+	public ToolPrinter()
+	{
+		String flag = getCommandLineFlag();
+
+		if (flag.startsWith("-"))
+			throw new RuntimeException(
+					"tool printer's command-line flag shouldn't start with a hyphen: " + flag);
+	}
+
+	public void setConfig(Configuration c)
+	{
 		this.config = c;
 	}
-	
+
 	protected OutputType outputType = OutputType.STDOUT;
 	private PrintStream outputStream; // used if printType = STDOUT or FILE
 	private HystFrame outputFrame; // used if printType = GUI
 	public StringBuffer outputString; // used if printType = STRING
-	
-	// static 
+
+	// static
 	private static DecimalFormat df = new DecimalFormat("0.#");
-		
+
 	public void setOutputFile(String filename)
 	{
 		outputType = OutputType.FILE;
 		outputFilename = filename;
 	}
-	
+
 	public void setOutputGui(HystFrame frame)
 	{
 		outputType = OutputType.GUI;
 		outputFrame = frame;
 	}
-	
+
 	public void setOutputNone()
 	{
 		outputType = OutputType.NONE;
 	}
-	
+
 	public void setOutputString()
 	{
 		outputType = OutputType.STRING;
 		outputString = new StringBuffer();
 	}
-	
-	/**
-	 * Set tool param string: needed to set tool parameters for tests
-	 * @param s
-	 */
-	public void setToolParamsString(String s) {
-		this.toolParamsString = s;
-	}
-	
+
 	/**
 	 * Prints the networked automaton out to the given file
-	 * @param networkedAutomaton the automaton to print
+	 * 
+	 * @param networkedAutomaton
+	 *            the automaton to print
 	 */
-	public void print(Configuration c, String toolParamsString, String originalFilename)
+	public void print(Configuration c, String argument, String originalFilename)
 	{
-		this.toolParamsString = toolParamsString;
 		this.originalFilename = originalFilename;
 
 		boolean shouldCloseStream = false;
-		
-		if (toolParamsString == null) 
-			throw new AutomatonExportException("toolsParamString was null in ToolPrinter.print()");
-		
+
 		setBaseName(originalFilename);
-		
-		populateParams();
-		
+
+		argument = argument.trim();
+		String[] args = AutomatonUtil.extractArgs(argument);
+
+		try
+		{
+			parser.parseArgument(args);
+		}
+		catch (CmdLineException e)
+		{
+			String message = "Error Using Printer for " + getToolName() + ",\n Message: "
+					+ e.getMessage() + "\nArguments: '" + argument + "'\n" + getParamHelp();
+
+			throw new CmdLineRuntimeException(message, e);
+		}
+
 		try
 		{
 			outputString = null;
 			outputStream = null;
-			
-			if (outputType == OutputType.STDOUT) {
+
+			if (outputType == OutputType.STDOUT)
+			{
 				outputStream = System.out;
 			}
 			else if (outputType == OutputType.FILE)
 			{
 				shouldCloseStream = true;
-				outputStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFilename)));
+				outputStream = new PrintStream(
+						new BufferedOutputStream(new FileOutputStream(outputFilename)));
 			}
 			else if (outputType == OutputType.STRING)
 				outputString = new StringBuffer();
-			
+
 			this.config = c;
-			checkPreconditions(c);
+
+			preconditions.check(c, getToolName());
 			printAutomaton();
+		}
+		catch (PreconditionsFailedException e)
+		{
+			throw new PreconditionsFailedException(
+					"Preconditions for tool " + getToolName() + " failed", e);
 		}
 		catch (FileNotFoundException e)
 		{
@@ -149,7 +177,7 @@ public abstract class ToolPrinter
 		}
 	}
 
-	private void setBaseName(String originalFilename)
+	protected void setBaseName(String originalFilename)
 	{
 		if (originalFilename == null || originalFilename.length() == 0)
 			baseName = "root";
@@ -157,16 +185,16 @@ public abstract class ToolPrinter
 		{
 			baseName = new File(originalFilename).getName();
 			int i = baseName.lastIndexOf(".");
-			
+
 			if (i != -1)
 				baseName = baseName.substring(0, i);
 		}
 	}
-	
+
 	/**
 	 * Print a newline in the output file stream
 	 */
-	protected void printNewline() 
+	protected void printNewline()
 	{
 		if (outputType == OutputType.STDOUT || outputType == OutputType.FILE)
 			outputStream.println();
@@ -179,7 +207,7 @@ public abstract class ToolPrinter
 	/**
 	 * Increase indent while printing
 	 */
-	protected void increaseIndentation() 
+	protected void increaseIndentation()
 	{
 		indentation += indentationAmount;
 	}
@@ -187,21 +215,34 @@ public abstract class ToolPrinter
 	/**
 	 * Decrease indent while printing
 	 */
-	protected void decreaseIndentation() 
+	protected void decreaseIndentation()
 	{
 		if (indentation.length() > 0)
 			indentation = indentation.substring(indentationAmount.length());
 	}
-	
+
+	/**
+	 * Create a comment block sting from comment text
+	 * 
+	 * @param text
+	 *            the text of the commend
+	 * @return the comment string
+	 */
+	protected String createCommentText(String text)
+	{
+		return this.indentation + commentChar + " "
+				+ text.replace("\n", "\n" + this.indentation + commentChar + " ") + "\n";
+	}
+
 	/**
 	 * Print several lines of text in a comment block
+	 * 
 	 * @param comment
 	 */
-	protected void printCommentblock(String comment) 
+	protected void printCommentBlock(String comment)
 	{
-		String s = this.indentation + commentChar + " " + 
-				comment.replace("\n", "\n" + this.indentation + commentChar + " ") + "\n";
-		
+		String s = createCommentText(comment);
+
 		if (outputType == OutputType.STDOUT || outputType == OutputType.FILE)
 			outputStream.println(s);
 		else if (outputType == OutputType.GUI)
@@ -209,69 +250,72 @@ public abstract class ToolPrinter
 		else if (outputType == OutputType.STRING)
 			outputString.append(s);
 	}
-	
+
 	/**
 	 * print a short comment
+	 * 
 	 * @param comment
 	 */
-	protected void printComment(String comment) {
+	protected void printComment(String comment)
+	{
 		printLine(this.commentChar + comment);
 	}
-	
-	protected String getCommentHeader() {
-		return "Created by " + Hyst.TOOL_NAME + "\n" +
-				"Hybrid Automaton in " + this.getToolName() + "\n" +
-				"Converted from file: " + originalFilename + "\n" +
-				"Command Line arguments: " + Hyst.programArguments;
+
+	protected String getCommentHeader()
+	{
+		return "Created by " + Hyst.TOOL_NAME + "\n" + "Hybrid Automaton in " + this.getToolName()
+				+ "\n" + "Converted from file: " + originalFilename + "\n"
+				+ "Command Line arguments: " + Hyst.programArguments;
 	}
-	
+
 	/**
 	 * Print header information as a comment with parameters, etc.
 	 */
-	protected void printCommentHeader() {
-		printCommentblock(getCommentHeader());
+	protected void printCommentHeader()
+	{
+		printCommentBlock(getCommentHeader());
 	}
-	
-	protected void printLine(String line) {
+
+	protected void printLine(String line)
+	{
 		this.printLine(line, true);
 	}
 
-	protected void printLine(String line, boolean indent) 
+	protected void printLine(String line, boolean indent)
 	{
-		if (indent && line.equals(decreaseIndentationString)) 
+		if (indent && line.equals(decreaseIndentationString))
 			decreaseIndentation();
-		
-		
+
 		String s = "";
-		if (indent) 
+		if (indent)
 			s += this.indentation;
-		
+
 		s += line;
-		
+
 		if (outputType == OutputType.STDOUT || outputType == OutputType.FILE)
 			outputStream.println(s);
 		else if (outputType == OutputType.GUI)
 			outputFrame.addOutput(s);
 		else if (outputType == OutputType.STRING)
-			outputString.append(s);
-		
-		if (indent && line.equals("{")) 
+			outputString.append(s + "\n");
+
+		if (indent && line.equals("{"))
 			increaseIndentation();
 	}
-	
-	protected void print(String s) 
+
+	protected void print(String s)
 	{
 		this.print(s, true);
 	}
-	
-	protected void print(String s, boolean indent) 
+
+	protected void print(String s, boolean indent)
 	{
 		String newS;
-		if (indent) 
+		if (indent)
 			newS = this.indentation + s;
-		else 
+		else
 			newS = s;
-		
+
 		if (outputType == OutputType.STDOUT || outputType == OutputType.FILE)
 			outputStream.print(newS);
 		else if (outputType == OutputType.GUI)
@@ -279,39 +323,43 @@ public abstract class ToolPrinter
 		else if (outputType == OutputType.STRING)
 			outputString.append(newS);
 	}
-	
+
 	/**
 	 * Get a string representation of the name of the tool, such as "SpaceEx" or "Flow*"
+	 * 
 	 * @return the name of the tool
 	 */
 	public abstract String getToolName();
-	
+
 	/**
-	 * Get the command line flag for this tool 
+	 * Get the command line flag for this tool
+	 * 
 	 * @return
 	 */
 	public abstract String getCommandLineFlag();
 
 	/**
 	 * Get a single-line comment character for the tool's output format
+	 * 
 	 * @return
 	 */
-	protected abstract String getCommentCharacter();
+	protected abstract String getCommentPrefix();
 
 	/**
 	 * Should this tool be considered release-quality, which will make it show up in the GUI
-	 * @return 
+	 * 
+	 * @return
 	 */
 	public boolean isInRelease()
 	{
 		return false;
 	}
-	
+
 	static
 	{
 		df.setMaximumFractionDigits(50);
 	}
-	
+
 	public static String doubleToString(double n)
 	{
 		return df.format(n);
@@ -322,78 +370,29 @@ public abstract class ToolPrinter
 		if (outputType == OutputType.STDOUT || outputType == OutputType.FILE)
 			outputStream.flush();
 	}
-	
-	/**
-	 * convert from toolParamsString to toolParams
-	 */
-	private void populateParams()
+
+	public String getParamHelp()
 	{
-		toolParams = getDefaultParams();
-		
-		Map <String, String> defParams = getDefaultParams();
-		
-		if (defParams == null && toolParamsString.length() > 0)
-			throw new AutomatonExportException("Printer does not expect any tool-specific paramers, but some were given.");
-		else if (defParams != null)
-			toolParams.putAll(defParams);
-		
-		if (toolParamsString.length() > 0 && toolParamsString.length() > 0)
-		{
-			String[] assignments = toolParamsString.split(":");
-			
-			for (String assignment : assignments)
-			{
-				String[] parts = assignment.split("=");
-				
-				if (parts.length != 2)
-				{
-					throw new AutomatonExportException("Tool Param must have a single '=' sign (params are separated by colons): " 
-							+ assignment);
-				}
-				
-				if (!toolParams.containsKey(parts[0]))
-					throw new AutomatonExportException("Invalid Tool Parameter: '" + parts[0] + "' in assignment " + assignment);
-				
-				toolParams.put(parts[0], parts[1]);
-				Hyst.log("Assigned tool parameter key '" + parts[0] + "' to value '" + parts[1] + "'");
-			}
-		}
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		parser.printUsage(out);
+
+		return out.toString();
 	}
-	
-	/**
-	 * Override this method to have tool-specific parameters set through the -toolparams flag
-	 * This method returns a map ParamName -> ParamValue, for every parameter you want to have, with the
-	 * default values already set.
-	 * 
-	 * In your printer, you can get the manually-set parameters using getToolParams()
-	 * @return a map of all the parameters for your printer, set to their default values
-	 */
-	public abstract Map <String, String> getDefaultParams();
 
 	/**
 	 * Get the default extension for model files for this printer
+	 * 
 	 * @return the default extension, or null
 	 */
 	public String getExtension()
 	{
 		return null;
 	}
-	
+
 	/**
-	 * Print the automaton. The configuration is stored in the global config variable. checkPreconditions() is called
-	 * before this method, which enforces printer assumptions (for example, that the model is flat).
+	 * Print the automaton. The configuration is stored in the global config variable.
+	 * checkPreconditions() is called before this method, which enforces printer assumptions (for
+	 * example, that the model is flat).
 	 */
 	protected abstract void printAutomaton();
-	
-	/**
-	 * Check the preconditions for the printer (for example, the modes should have at least 1 variable, no urgrent modes, ect)
-	 * Typically, you'll change preconditions.skip direction to indicate which checks should be skipped
-	 * Alternatively, printers can override this if they don't want to use the PrinterPreconditions way of doing it.
-	 * This should throw a PrinterPreconditionException if assumptions about the model are violated.
-	 * @param c the configuration before passing it to the printer
-	 */
-	protected void checkPreconditions(Configuration c)
-	{
-		preconditions.check(c, this.getClass().getName());
-	}
 }

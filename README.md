@@ -17,11 +17,70 @@ HyST started during a 2014 Visiting Faculty Research Program visit by Taylor to 
 
 THIS SOFTWARE WAS DEVELOPED WITH FUNDING BY AIR FORCE RESEARCH LABORATORY (AFRL) AND IS APPROVED FOR PUBLIC RELEASE. DISTRIBUTION A. Approved for public release; Distribution unlimited. (Approval AFRL PA case number 88ABW-2016-1014, 08 MAR 2016.)
 
+***********************************
+### References
+***********************************
+The primary HyST paper is this one:
+
+* Stanley Bak, Sergiy Bogomolov, Taylor T. Johnson, "HyST: A Source Transformation and Translation Tool for Hybrid Automaton Models", In 18th International Conference on Hybrid Systems: Computation and Control (HSCC 2015), ACM, Seattle, Washington, 2015, April. [http://www.taylortjohnson.com/research/bak2015hscc.pdf]
+
+Other related papers that extend and/or make use of HyST are these. Some of these papers describe new translations (e.g., to Simulink/Stateflow) or model transformations, the latter of which are typically sound abstractions.
+
+* Stanley Bak, Omar Ali Beg, Sergiy Bogomolov, Taylor T. Johnson, Luan Viet Nguyen, Christian Schilling, "Hybrid automata: from verification to implementation", In Software Tools for Technology Transfer (STTT), Springer, 2017, August. [http://www.taylortjohnson.com/research/bak2017sttt.pdf]
+* Hoang-Dung Tran, Luan Viet Nguyen, Weiming Xiang, Taylor T. Johnson, "Order-reduction abstractions for safety verification of high-dimensional linear systems", In Discrete Event Dynamic Systems (DEDS), 2017. [http://rdcu.be/q8Xd]
+* Stanley Bak, Sergiy Bogomolov, Thomas A. Henzinger, Taylor T. Johnson, Pradyot Prakash, "Scalable Static Hybridization Methods for Analysis of Nonlinear Systems", In 19th Intl. Conf. on Hybrid Systems: Computation and Control (HSCC 2016), ACM, 2016, April. [http://www.taylortjohnson.com/research/bak2016hscc.pdf]
+* Andrew Sogokon, Khalil Ghorbal, Taylor T. Johnson, "Decoupled simulating abstractions of non-linear ordinary differential equations", Chapter in Proceedings of the 21st International Symposium on Formal Methods (FM 2016), Limassol, Cyprus, 2016, December. [http://www.taylortjohnson.com/research/sogokon2016fm.pdf]
+* Stanley Bak, Taylor T. Johnson, "Periodically-Scheduled Controller Analysis using Hybrid Systems Reachability and Continuization", In 36th IEEE Real-Time Systems Symposium (RTSS 2015), IEEE Computer Society, San Antonio, Texas, 2015, December. [http://www.taylortjohnson.com/research/bak2015rtss.pdf]
+
+There are several benchmark description papers that provide models in the format of HyST. Please refer to the ARCH workshop where most of these were presented here: [https://cps-vo.org/group/ARCH/benchmarks]
+
+***********************************
+### Repeatability Evaluation Virtual Machine (REVM) with Tools Installed
+***********************************
+
+A VMWare virtual machine running Ubuntu is available with most of the supported tools already installed and with HyST set up. This allows easy use of HyST and the supported tools, including HyPy for scripting evaluation of benchmarks.
+
+The VM is downloadable from:
+
+With all tools (no Matlab):
+
+https://www.dropbox.com/s/oqnn6p9yvv7z1j8/hyst-2016-02-02.7z?dl=0
+
+We have a version that we may privately share with Matlab also set up that you are required to install your own license file to run.
+
+#### GitHub Setup on REVM
+
+The HyST github repository is at `~/hyst`. You need to set up your own GitHub username and an RSA public key to use GitHub with HyST (e.g., to pull latest updates from the current GitHub repository).
+
+Instructions for setting up git via an ssh RSA key are available here:
+
+https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
+
+The basic commandline instructions are:
+
+```
+cd ~/hyst
+
+git config --global user.name "ttj"
+
+git config --global user.name
+
+ssh-keygen -t rsa -b 4096 -C "your_github_email@example.com"
+
+eval $(ssh-agent -s)
+
+ssh-add ~/.ssh/id_rsa
+
+echo ~/.ssh/id_rsa.pub
+```
+
+Then copy the resultant RSA public key as a new SSH RSA key in GitHub.
+
 ************************************
 ### HYST USAGE
 ************************************
 
-Hyst has been tested on Windows 7/8/10 and Linux (Ubuntu) using Java 1.7 and Java 1.8.
+Hyst has been tested on Windows 7/8/10 and Linux (Ubuntu x64) using Java 1.7 and Java 1.8.
 
 #### VIRTUAL MACHINE:
 
@@ -37,54 +96,44 @@ $ java -jar Hyst.jar
 
 #### COMMAND-LINE USAGE: 
 
-After building Hyst.jar, you can run it as an executable .jar file with the -help flag to see usage:
+After building Hyst.jar, you can run it as an executable .jar file with the -help flag to see the high-level usage:
 
 ```
 $ java -jar Hyst.jar -help
-Hyst v1.17
-Usage:
-hyst [OutputType] (args) XMLFilename(s) (CFGFilename)
-
-OutputType:
-	-flowstar Flow* format
-	-dreach dReach format
-        -hycomp HyComp/HyDI format
-	-hycreate HyCreate2 format
-	-hycreate_sim HyCreate2 format
-	-qbmc Python QBMC (Testing) format
-	-spaceex SpaceEx format
-	-z SMT-LIB printer format
-Optional Model Transformation Passes:
-	-pass_pi Pseudo-Invariant at Point Pass [(modename|)pt1;inv_dir1|pt2;inv_dir2|...] (point/invariant direction is a comma-separated list of reals)
-	-pass_pi_sim Pseudo-Invariant Simulation Pass [time1;time2;...]
-	-pass_scale_time Scale Time Pass [multiplier;ignorevar]
-	-pass_sub_constants Substitute Named Constants for Values Pass [no param]
-	-pass_simplify Simplify Expressions Pass [no param]
-	-pass_split_disjunctions Split Guards with Disjunctions [no param]
-	-pass_remove_unsat Remove Unsatisfiable Modes Pass [no param]
-	-shorten Shorten Mode Names Pass [no param]
-	-regularize Regularization (eliminate zeno behaviors) Pass [<num jumps>;<delta>;<epsilon>]
-
--help show this command-line help text
--v Enable verbose printing
--debug Enable debug printing (even more verbose)
--novalidate skip internal model validation (may result in Exceptions being thrown)
--o [filename] output to the given filename
-XMLFilename: The SpaceEx XML automaton to be processed (*.xml)
-CFGFilename: The automaton's config file. Will be derived from the XML filename if not explicitly stated (*.cfg)
+Hyst v1.6 General Usage:
+ -debug (-d)                            : print debug (and verbose) output
+                                          (default: false)
+ -generate (-gen) GEN_NAME GEN_PARAMS   : generate a model (rather than loading
+                                          from a file)
+ -help (-h)                             : print command-line usage (default:
+                                          true)
+ -help_generators                       : print usage information on model
+                                          generators (default: false)
+ -help_passes                           : print usage information on
+                                          transformation passes (default: false)
+ -help_printers                         : print usage information on tool
+                                          printers (default: false)
+ -input (-i) FILE1 FILE2 ...            : input filenames
+ -output (-o) FILENAME                  : output filename
+ -passes (-p) PASS1 PARAMS1 PASS2       : run a sequence of model
+ PARAMS2 ...                              transformation passes
+ -tool (-t) TOOLNAME TOOLPARAMS         : target tool and tool params
+ -verbose (-v)                          : print verbose output (default: false)
 ```
+
+Hyst consists of tool printers, model transformation passes, and model generators. To see help on the individual items, try help_printers,  -help_passes, and -help_generators. After you select a printer, pass, or generator, you then must provide an argument (even if it's empty)
 
 #### CONVERTING AN EXAMPLE: 
 
-To convert from a SpaceEx model, you run Hyst, provide the proper flag for the format you want to output, and the path to the SpaceEx .xml and, if named differently the .cfg file. You can also provide an output filename with the -o flag (stdout will be used otherwise, which may be incompatible with model formats that require multiple files).
+To convert from a SpaceEx model on the command line, you run Hyst, use the -tool (or -t) flag to select the format you want to output, use the -input (or -i) the path to the SpaceEx .xml and, if named differently, the .cfg file. You can also provide an output filename with the -o flag (stdout will be used otherwise).
 
 From the default directory of hyst/src (where Hyst.jar is compiled), execute:
 
 ```
-$ java -jar Hyst.jar -flowstar ../examples/toy/toy.xml
+$ java -jar Hyst.jar -tool flowstar "" -input ../examples/toy/toy.xml
 ```
 
-In this case -flowstar indicates we want a model in the Flow* format (see the usage above). The .cfg file will be assumed to be ../examples/toy/toy.cfg since it is not explicitly specified. Since no filename is given using the -o flag, the output will be printed to stdout.
+In this case flowstar indicates we want a model in the Flow* format, the next argument is the tool printer argument (in this case, the empty string). The input .cfg file, since it's not explicitly provided, is assumed to be ../examples/toy/toy.cfg. Since no filename is given using the -o flag, the output is printed to stdout.
 
 ************************
 ### SPECIFIC EXAMPLES FOR SUPPORTED OUTPUT FORMATS
@@ -93,7 +142,7 @@ In this case -flowstar indicates we want a model in the Flow* format (see the us
 #### HYCREATE2: http://stanleybak.com/projects/hycreate/hycreate.html
 
 ```
-java -jar Hyst.jar ../examples/heaterLygeros/heaterLygeros.xml -hycreate -o heaterLygeros.hycreate
+java -jar Hyst.jar -i ../examples/heaterLygeros/heaterLygeros.xml -t hycreate "" -o heaterLygeros.hycreate
 ```
 
 This will convert the heater/thermostat example described in the paper to the HyCreate2 format, and write the result to the file heaterLygeros.hycreate.
@@ -101,7 +150,7 @@ This will convert the heater/thermostat example described in the paper to the Hy
 #### FLOW*: http://systems.cs.colorado.edu/research/cyberphysical/taylormodels/
 
 ```
-java -jar Hyst.jar ../examples/heaterLygeros/heaterLygeros.xml -flowstar -o heaterLygeros.flow
+java -jar Hyst.jar -i ../examples/heaterLygeros/heaterLygeros.xml -t flowstar "" -o heaterLygeros.flowstar
 ```
 
 #### DREACH: http://dreal.github.io/dReach/
@@ -109,7 +158,7 @@ java -jar Hyst.jar ../examples/heaterLygeros/heaterLygeros.xml -flowstar -o heat
 NOTE: dReach (as of this writing) requires files to have the extension .drh to execute.
 
 ```
-java -jar Hyst.jar ../examples/heaterLygeros/heaterLygeros.xml -dreach -o heaterLygeros.drh
+java -jar Hyst.jar -i ../examples/heaterLygeros/heaterLygeros.xml -t dreach "" -o heaterLygeros.drh
 ```
 
 #### SPACEEX: http://spaceex.imag.fr/
@@ -117,40 +166,20 @@ java -jar Hyst.jar ../examples/heaterLygeros/heaterLygeros.xml -dreach -o heater
 You may want to convert from a SpaceEx model back to SpaceEx to run some transformation passes or just to do network flattening.
 
 ```
-java -jar Hyst.jar examples/heaterLygeros/heaterLygeros.xml -spaceex -o heaterLygeros.xml
+java -jar Hyst.jar -i ../examples/heaterLygeros/heaterLygeros.xml -t spaceex "" -o heaterLygeros.xml
 ```
 
 #### HYCOMP / HYDI / NUXMV: https://es-static.fbk.eu/tools/hycomp/
 
 ```
-java -jar Hyst.jar examples/heaterLygeros/heaterLygeros.xml -hycomp -o heaterLygeros.hydi
+java -jar Hyst.jar -i ../examples/heaterLygeros/heaterLygeros.xml -t hycomp "" -o heaterLygeros.hydi
 ```
 
 #### EXAMPLES AND RESULTS DIRECTORY:
 
 Several examples have been included which can be converted in the examples directory. The result shows the result of converting the models and running them with the various tools using the default settings (not all tools complete on all models).
 
-Some examples are not yet complete, as we are currently working to convert all the ARCH 2014/2015 workshop (http://cps-vo.org/group/ARCH) benchmarks to SpaceEx format (where possible).
-
-#### ADVANCED USAGE:
-
-To generate the output plots provided across all the examples, we have included Python scripts to call HYST against all examples in all formats.  See them in:
-
-```
-src\hybridpy\hybrid_tool.py
-```
-
-Additionally, the scripts provided the ability to call the tools themselves and generate plots.  If you are interested to do this, please contact us and we will share our repository to help get you set up.
-
-To run Hyst on all the models, as well as the associated tools in a batch run, simply do:
-
-```
-python run_examples.py
-```
-
-In run_examples.py there are a bunch of global variables you can set for different parameters (such as different timeouts, the paths to the tool binaries to run). The tool binaries are NOT included in this package (they each have their own licenses you should read before using). The result is placed in the result folder. 
-
-A copy of the expected model files and plot files produced is in the expected_results directory. Also included is stdout.txt which includes stdout when running the script.
+Some examples are not yet complete, as we are currently working to convert all the ARCH 2014/2015/2016 workshop (http://cps-vo.org/group/ARCH) benchmarks to SpaceEx format (where possible).
 
 *******************************
 ### DEVELOPER USAGE
@@ -167,7 +196,7 @@ The basic process is:
 3) push changes to your fork
 4) issue pull request, we will review it and then approve if it looks good
 
-Please create unit tests and possibly regression tests for any changes submitted (e.g., see unit tests here: https://github.com/verivital/hyst/tree/master/src/java/com/verivital/hyst/junit and see regression tests here: https://github.com/verivital/hyst/tree/master/src/tests/regression ), this way we will know if we accidentally break any changes you've committed through other changes in Hyst.
+Please create unit tests and possibly integration tests for any changes submitted (e.g., see unit tests here: https://github.com/verivital/hyst/tree/master/src/java/com/verivital/hyst/junit and see integration tests here: https://github.com/verivital/hyst/tree/master/src/tests/integration ), this way we will know if we accidentally break any changes you've committed through other changes in Hyst. The easiest way to run all the tests is with ant. Do "ant test" in the src folder for this option.
 
 #### Code Quality:
 
@@ -180,10 +209,15 @@ If you plan to do Hyst development that will work its way back into the main bra
 * Instead of printing status messages to stdout, use `Hyst.log` or `Hyst.logDebug`
 * Delete commented-out garbage code.
 * Use meaningful variable and method names.
-* Use Java naming conventions for class and method names. Class names should be CapitalizedCamelCase, and methods should be lowercaseFirstCamelCase.
-* Use consistent a per-file code format. We have different conventions between different files, which isn't ideal, but each file should be consistent. In Eclipse you can right click within a file and do Source -> Format and it will reformat it for you.
-* Please try to keep lines less than 120 characters. If your lines are too long, consider breaking them up into multiple shorter lines that are easier to read.
+* Use Java naming conventions for class and method names. Class names should be CapitalizedCamelCase, and methods should be lowercaseFirstCamelCase. 
 * If you copy a printer as a template, for example the Flow* printer, your final printer shouldn't make references to Flow* or its parameters. Read through your code before submitting.
+* Please follow the Hyst Code Format. There is an ant option, "ant reformat" which will use eclipse to reformat your code according to our naming conventions.
+
+#### Code Format:
+
+Hyst has a standard code format. When you run ant, if the eclipse executable is on your path, it will automatically try to reformat every java file. You will see a message: "Eclipse is present. Performing code reformatting." Otherwise, if it cannot find eclipse, you'll see this message "Eclipse NOT found on PATH. Your code will not be auto-reformatted." If the reformat process fails, it might be because the format file is open within eclipse. Try closing eclipse and then running ant again.
+
+You can save significant coding time by setting up auto formatting every time you save your code. The Eclipse file describing the Hyst code format is in hyst/HystCodeFormat.xml. To import this file into Eclipse, go to Project Properties -> Java Code Style -> Formatter -> Enable Project Specific Settings -> Import, and then select HystCodeFormat.xml. To reformat every time you save (recommended), go to Project Properties, choose Java -> Editor -> Save Actions -> Enable Project Specific Properties. Next, enable the "Perform the selected actions on save", and check the "Format source code" box. You make also want to select "Organize Imports" as a save action.
 
 #### BUILDING HYST: 
 
@@ -192,7 +226,9 @@ To build Hyst, proceed to the hyst/src/ directory and run "ant". This will creat
 
 #### TESTS:
 
-There are included unit tests as well as regression tests. You can run these using "ant test". The regression tests may require tool step in the file src/tests/regression/run_tests.py
+There are many tests included with Hyst. There are unit tests (Java JUnit tests), python unit tests, integration tests (run each tool on the produced models), and generator/pass tests. You can run all of these using "ant test". 
+
+Before the tools can run, however, you'll need to setup your HYPYPATH to the proper executables, see the hypy section below.
 
 *******************************
 #### ADDING A NEW PRINTER:
@@ -245,7 +281,7 @@ Another basic example is the ShortenModeNamesPass.java ( https://github.com/veri
 
 You need to compile with antlr-4.4-runtime.jar and several others jars (in /lib) on your classpath. In Eclipse, you do this by going to: 
 
-Project -> Properties -> Java Build Path -> Libraries -> Add External Jar -> select the antlt-4.4-complete.jar file (should be in the project directory) -> Ok
+Project -> Properties -> Java Build Path -> Libraries -> Add External Jar -> select the antlr-4.4-complete.jar file (should be in the project directory) -> Ok
 
 #### UBUNTU RIGHT-CLICK CONTEXT MENU FOR TOOL RUNNING:
 
@@ -256,84 +292,146 @@ The right click context menu was done using Nautilus Actions Configuration Tool.
 To run the .class files directly, rather than from the .jar, you also need this jar on your classpath (option -cp to java).
 
 *******************************************************************************
-HYPY (by Stanley Bak)
+Python Interface within Hyst (by Stanley Bak)
 *******************************************************************************
 
-DEPENDENCIES:
+Hyst has an optional interface with python, which may be required for some transformation passes. To test if python and the required packages are detected correctly, use the hidden '-testpython' flag from the command line. If python is not setup correctly, you can add the -debug flag to get terminal output to get more insight into the problem.
+
+Currently, Python 2.7 needs to be installed, as well as the following packages:
 
 * sympy: https://github.com/sympy/sympy/releases
 
-pip install sympy
+* scipy: http://www.scipy.org/install.html
 
-For plotting:
+* matplotlib:  http://matplotlib.org/users/installing.html
 
-* matplotlib: http://matplotlib.org/
+The python executable will be looked for on the paths given in the environment variable HYST_PYTHON_PATH, as well as PATH. It will look for binaries named python2.7 and python.
 
-pip install matplotlib
 
 *******************************************************************************
-MODEL TRANSFORMATION PASSES:
+Kodiak for Optimization (by Stanley Bak)
 *******************************************************************************
 
-* Hybridization (by Pradyot Prakash)
+For validated optimization tasks in Hyst, kodiak is an option. Kodiak is a NASA tool which uses interval branch and bound and Bernstein expansions to come up with upper and lower bounds on a nonlinear function, given interval bounds. To use this, the kodiak executable must be on your PATH or KODIAK_PATH environment variable.
 
-taylor2pradyot: can we call it from Hyst.jar or what? Can you please add a full call for an example that is executable (see above, for example, e.g., such as java -jar Hyst.jar ../../examples/heaterLygeros/heaterLygeros.xml -dreach -o heaterLygeros.drh )
+*******************************************************************************
+Running the Integration Tests and HYPY (by Stanley Bak)
+*******************************************************************************
 
-DEPENDENCIES: scipy
+The integration tests (run each tool on each generated model) make use of hypy, which is a python library for running reachability tools and producing plots. 
 
-INSTALLATION:
+#### Description
 
-Windows:
+Hypy can be used to run Hyst (including its transformation passes), as well as various reachability and simulation tools, and then interpret their output. This can then be looped in a python script, enabling high-level hybrid systems analysis which involves running tools multiple times.
 
-0)
+#### Setup
 
-It may or may not be necessary to install MinGW, I gave up, it's possible the below C++ compiler is the only dependency, as I did get it to finish building, but it apparently did not properly install the package as calling the hybridize pass still failed.
+First, install the dependencies:
 
-Scipy is a pain to install via pip. But if you want to try, here are some ideas. Alternative is just to install YET ANOTHER Python runtime on Windows (but then would have to get this properly set up on the PATH to make this work with Hyst, since there's not a way to specify which Python install to use in Hyst [as far as I know]).
+* see above at "Python Interface within Hyst"
+* GIMP (for flowstar support): https://www.gimp.org/
+* GNU plotutils (for SpaceEx support): https://www.gnu.org/software/plotutils/
 
-http://stackoverflow.com/questions/12628164/trouble-installing-scipy-on-windows
+For easy usage, you need to point your PYTHONPATH environment variable to the hypy (hybridpy) directory. To setup hypy to run the tools, you'll need to define the environment variables HYPYPPATH to include the folders of the tool libraries. At a minimum (for conversion), you must include the folder where the Hyst jar file resides. On Ubuntu, in your ~/.profile file you can do something like:
 
-Have to have MingGW etc. with a GNU compiler to use pip, alternative is to find some binary distribution, but the Python community (and scipy community) are hugely fragmented, so there doesn't seem to be a great version to use, unfortunately.
+```
+###### HYPY #########
+export PYTHONPATH="${PYTHONPATH}:$HOME/repositories/hyst/src/hybridpy"
 
-After installing MingGW, have to add the C:\MinGW\bin directory (or wherever installed) to the Windows path.
+##### HYPY environment variables #####
+TOOL_DIR="$HOME/tools"
 
-1) Download and install this (Visual C++ Compiler for Python 2.7):  http://aka.ms/vcpython27
-2) pip install scipy
+# add path to hyst .jar file
+export HYPYPATH="$HOME/repositories/hyst/src" 
 
-Linux:
+# add path to each of the tools
+export HYPYPATH="${HYPYPATH}:$TOOL_DIR/flowstar-2.0.0"
+export HYPYPATH="${HYPYPATH}:$TOOL_DIR/spaceex"
+export HYPYPATH="${HYPYPATH}:$TOOL_DIR/dreach/dReal-2.15.01-linux/bin"
+export HYPYPATH="${HYPYPATH}:$TOOL_DIR/HyCreate2.8"
+```
 
-To install via pip, must have fortan compiler and other dependencies installed, see here for overview: http://stackoverflow.com/questions/2213551/installing-scipy-with-pip
+#### Pysim
 
-1) 
-sudo apt-get install python-pip python-dev build-essential
+Pysim is a simple simulation library for a hybrid automata. It is written in python, and can be run directly using hypy.
 
-2)
-sudo pip install numpy
-sudo apt-get install libatlas-base-dev gfortran
-sudo pip install scipy
+pysim dependencies:
 
-3) 
-sudo pip install matplotlib   OR  sudo apt-get install python-matplotlib
-sudo pip install -U scikit-learn
-sudo pip install pandas
+* scipy: http://www.scipy.org/install.html
 
-You can call the HybridizePass.java as follows:
+* matplotlib:  http://matplotlib.org/users/installing.html
 
--hybridize <variable corresponding to first dimension>,..<variable corresponding to nth dimension>,<lower bound for the first dimension>,<upper bound for the same dimension>,....,<lower bound for the last dimension>,<upper bound for the last dimension>,<number of partitions along the first dimension>,...,<number of partitions along the last dimension>,<'a' if you want a affine system/'l' if you want a piecewise constant system>
+#### Example
 
-For eg,
-Consider the van der pol system.
-It has two variables x and y.
+A simple hypy script to test if it's working (you may need to adjust your path to the model file) is:
 
-Suppose we want to consider the interval [-1,2] along the x-axis and [3,4] along y-axis and want 2 partitions along x axis and 3 along y axis, then you should call
--hybridize x,y,-1,2,3,4,2,3,a
+```
+'''
+Test hypy on the toy model (path may need to be adjusted)
+'''
 
-You can also call
--hybridize y,x,3,4,-1,2,3,2,a
+# assumes hybridpy is on your PYTHONPATH
+import hybridpy.hypy as hypy
 
-The last argument 'a' means that you want a final system with affine dynamics in each of the modes. It can also be 'l' if you want a Linear Hybrid Automata with piecewise constant dynamics.
+def main():
+    '''run the toy model and produce a plot'''
+    
+    model = "/home/stan/repositories/hyst/examples/toy/toy.xml"
+    
+    e = hypy.Engine('pysim')
+    e.set_input(model) # sets input model path
+    result = e.run(image_path="toy_output.png")
+    
+    if result['code'] != hypy.Engine.SUCCESS:
+        print "engine.run() returned error: {}".format(result['code'])
+        exit(1)
+        
+    print "Completed successfully"
 
+if __name__ == "__main__":
+    main()
+```
 
+*******************************************************************************
+Adding Tools to Hypy:
+*******************************************************************************
+
+When you run hypy, it will (1) convert using Hyst and (2) run the desired tool. If hyst is failing, you can try to get more information by doing `e.set_verbose(True)` or `e.set_debug(True)` on the hypy engine object. If that still doesn't help, you are better off doing these two steps independently, first just running hyst and producing a model file, then take the model file and running it directly in the tool (one of these two will fail and you can investigate further).
+
+The implementation of hypy is in hyst/src/hybridpy. Each supported tool in hypy has a tool-specific script which provides a common interface to each tool. This tool-specific script is implemented in the tool_*.py file, and it inherits from the HybridTool object (defined in hybrid_tool.ph). You need to write custom functions (override the abstract ones in HybridTool) that (1) run the tool, (2) produce an image at the desired path, and (3) read the output into a python object (optional). Such files already exists for flow*, spaceex, hycreate, and dreach (but that one doesn't produce an image since dreach makes that difficult). For example, you can find the tool-specific file for flowstar in hyst/src/hybridpy/hybridpy/tool_flowstar.py . After you write the tool-specific file, you need to modify hypy.py to add the appropriate import statement for your tool-specific script and add the tool object to the list of known tools near the top of the fily:
+
+```
+# tools for which models can be generated
+TOOLS = {'flowstar':FlowstarTool(), 'hycreate':HyCreateTool(), \
+         'spaceex':SpaceExTool(), 'dreach':DReachTool(), 'pysim':PySimTool()}
+```
+
+Each tool-specific file should be directly runnable from the command line rather than through hypy. If run directly, no hyst conversion is done. This is enabled by adding the following at the bottom of a tool-specific script (for Flow*, for example):
+
+```
+if __name__ == "__main__":
+    tool_main(FlowstarTool())
+```
+
+the tool_main is a generic method (defined in hybrid_tool.py), which will call the appropriate methods in the passing-in HybridTool object. If you need extra parameters from the command line, see how it is done in tool_spaceex.py.
+
+Once the tool-specific script is written and you added your tool to hypy.py, you should test by running hypy from a terminal. You should try:
+
+(1) the direct run approach: python /path/to/tool_<toolname>.py <input model> <(optional) output image png path>
+
+(2) the conversion and run approach: python /path/to/hybridpy.py <tool name> <input .xml model> <output image png path>
+
+*******************************************************************************
+Model Transformation Passes:
+*******************************************************************************
+
+Demonstration hypy scripts for certain, more complicated, model transformation passes are provided in the doc/transformation_passes directory. There are READMEs inside each sub-directory which provide additional information about the specific pass being demonstrated.
+
+*******************************************************************************
+Model Generation:
+*******************************************************************************
+
+Demonstration hypy scripts for certain model generators are provided in the doc/model_generators directory. There are READMEs inside each sub-directory which provide additional information about the specific generator being demonstrated.
 
 *****************************************
 ADDITIONAL PRINTER DOCUMENTATION

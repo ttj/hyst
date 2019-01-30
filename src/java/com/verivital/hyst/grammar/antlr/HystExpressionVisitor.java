@@ -19,12 +19,26 @@ public interface HystExpressionVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMatrixRowExp(HystExpressionParser.MatrixRowExpContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Matrix}
+	 * Visit a parse tree produced by the {@code MatrixRangeExp}
+	 * labeled alternative in {@link HystExpressionParser#matrixRange}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMatrixRangeExp(HystExpressionParser.MatrixRangeExpContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code MatrixExplicit}
 	 * labeled alternative in {@link HystExpressionParser#matrixExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMatrix(HystExpressionParser.MatrixContext ctx);
+	T visitMatrixExplicit(HystExpressionParser.MatrixExplicitContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code MatrixGenerated}
+	 * labeled alternative in {@link HystExpressionParser#matrixExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMatrixGenerated(HystExpressionParser.MatrixGeneratedContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code Function}
 	 * labeled alternative in {@link HystExpressionParser#functionExpression}.
@@ -151,13 +165,6 @@ public interface HystExpressionVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitAndExpression(HystExpressionParser.AndExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code ToNot}
-	 * labeled alternative in {@link HystExpressionParser#and}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitToNot(HystExpressionParser.ToNotContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code NotExpression}
 	 * labeled alternative in {@link HystExpressionParser#not}.

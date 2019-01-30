@@ -1,5 +1,18 @@
 package com.verivital.hyst.printers;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
+import org.kohsuke.args4j.Option;
+
 import com.verivital.hyst.geometry.Interval;
 import com.verivital.hyst.grammar.formula.Constant;
 import com.verivital.hyst.grammar.formula.DefaultExpressionPrinter;
@@ -18,58 +31,28 @@ import com.verivital.hyst.util.Classification;
 import com.verivital.hyst.util.RangeExtractor;
 import com.verivital.hyst.util.RangeExtractor.UnsupportedConditionException;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
 import matlabcontrol.MatlabProxy;
 
 /**
- * Printer for Simulink/Stateflow models with non-semantics preservation and
- * semantics preservation modes
+ * Printer for Simulink/Stateflow models with non-semantics preservation and semantics preservation
+ * modes
  * 
- * Semantics preservation uses randomness to approximate nondeterministic behavior allowed in hybrid automata
+ * Semantics preservation uses randomness to approximate nondeterministic behavior allowed in hybrid
+ * automata
  * 
- * Non-semantics preserving is a basic translation, and in practice, often does preserve semantics (so the name is poor), 
- * under the assumption that the original automata
- * is deterministic, non-Zeno, and some other assumptions that need to be clarified by Luan/Christian.
+ * Non-semantics preserving is a basic translation, and in practice, often does preserve semantics
+ * (so the name is poor), under the assumption that the original automata is deterministic,
+ * non-Zeno, and some other assumptions that need to be clarified by Luan/Christian.
  * 
  * @author Christian Schilling, Luan Nguyen
  */
-public class SimulinkStateflowPrinter extends ToolPrinter {
+public class SimulinkStateflowPrinter extends ToolPrinter
+{
 
-	/**
-	 * TODO: update, this is just copied
-	 */
-	public Map<String, String> getDefaultParams() {
-		LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-
-		// TODO: this needs to be pulled in in part from the Configuration object, as some of these may already be specified there
-		// although of course doing some transformation between configurations of simulators vs. reachability tools is perhaps a bit unrealistic at this stage
-		/*params.put("time", "auto");
-		params.put("step", "auto-auto");
-		params.put("remainder", "1e-4");
-		params.put("precondition", "auto");
-		params.put("plot", "auto");
-		params.put("orders", "3-8");
-		params.put("cutoff", "1e-15");
-		params.put("precision", "53");
-		params.put("jumps", "99999999");
-		params.put("print", "on");
-		params.put("aggregation", "parallelotope");*/
-		params.put("semantics", "0"); // 0 = no transformation, 1 = add epsilons
-
-		return params;
-	}
+	@Option(name = "-semantics", usage = "Use semantics preserving printer? 0 = no transformation, 1 = add epsilons", metaVar = "0/1")
+	public String semantics = "0";
 
 	// ------------- normal instance fields -------------
 
@@ -152,9 +135,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	// ------------- normal static fields -------------
 
 	/*
-	 * NOTE: this is a bug in Stateflow: it REQUIRES it seems newlines to always
-	 * be Unix-style, regardless of Host operating system, so e.g., using,
-	 * System.lineSeparator() does not work
+	 * NOTE: this is a bug in Stateflow: it REQUIRES it seems newlines to always be Unix-style,
+	 * regardless of Host operating system, so e.g., using, System.lineSeparator() does not work
 	 */
 	public static final String lineSeparator = "\n";
 
@@ -170,22 +152,28 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * 
 	 */
 
-	protected void printDocument(String originalFilename) {
+	protected void printDocument(String originalFilename)
+	{
 
-		printCommentblock(
-				Hyst.TOOL_NAME + "\n" + "Hybrid Automaton in " + Hyst.TOOL_NAME + "\n" + "Converted from file: "
-						+ originalFilename + "\n" + "Command Line arguments: " + Hyst.programArguments);
+		printCommentBlock(Hyst.TOOL_NAME + "\n" + "Hybrid Automaton in " + Hyst.TOOL_NAME + "\n"
+				+ "Converted from file: " + originalFilename + "\n" + "Command Line arguments: "
+				+ Hyst.programArguments);
 
-		Expression.expressionPrinter = new SimulinkStateflowPrinter.SimulinkStateflowExpressionPrinter(0); // TODO:
-																								// move
-																								// to
-																								// constructor?
+		Expression.expressionPrinter = new SimulinkStateflowPrinter.SimulinkStateflowExpressionPrinter(
+				0); // TODO:
+		// move
+		// to
+		// constructor?
 
 		// begin printing the actual program
 		// printNewline();
-		try {
-			printProcedure(originalFilename); // semantics decision is made via toolparams
-		} catch (Exception ex) {
+		try
+		{
+			printProcedure(originalFilename); // semantics decision is made via
+												// toolparams
+		}
+		catch (Exception ex)
+		{
 
 		}
 	}
@@ -193,46 +181,69 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	/**
 	 * Calling Matlab from java to
 	 */
-	public void printProcedure(String originalFilename) {
+	public void printProcedure(String originalFilename)
+	{
 		File f = new File(originalFilename);
-		
-		String example_name = f.getName().substring(0, f.getName().lastIndexOf('.')); // strip extension
-		String cmd_string = "SpaceExToStateflow('..\\" + f.getParent() + "\\" + example_name + ".xml'";
-		if (this.toolParams.get("semantics").equals("1")) {
-			System.out.println("Translating with semantics preserving mode with randomness," + this.toolParams.get("semantics"));
+
+		String example_name = f.getName().substring(0, f.getName().lastIndexOf('.')); // strip
+																						// extension
+		String cmd_string = "SpaceExToStateflow('..\\" + f.getParent() + "\\" + example_name
+				+ ".xml'";
+		if (semantics.equals("1"))
+		{
+			System.out.println(
+					"Translating with semantics preserving mode with randomness," + semantics);
 			cmd_string += ", '-s')";
-		} else {
-			System.out.println("Translating with best gusses via non-semantics preserving mode, " + this.toolParams.get("semantics"));
+		}
+		else
+		{
+			System.out.println(
+					"Translating with best gusses via non-semantics preserving mode, " + semantics);
 			cmd_string += ")";
 		}
 		System.out.println(cmd_string);
-		
+
 		MatlabProxy proxy = null;
-		try {
+		try
+		{
 			proxy = MatlabBridge.getInstance().getProxy();
-		
+
 			proxy.eval("[path_parent,path_current] = fileparts(pwd)");
-			
-			// TODO: LUAN, please resolve, you should not have pass dependent stuff in the general printer.
+
+			// TODO: LUAN, please resolve, you should not have pass dependent
+			// stuff in the general printer.
 			proxy.eval("if strcmp(path_current, 'pass_order_reduction') cd ../../; end");
-			
+
 			proxy.eval("[path_parent,path_current] = fileparts(pwd)");
-			proxy.eval("if ~strcmp(path_current, 'matlab') cd ./matlab; end"); // NOTE: if the directory structure changes, this could break
-			
+			proxy.eval("if ~strcmp(path_current, 'matlab') cd ./matlab; end"); // NOTE:
+																				// if
+																				// the
+																				// directory
+																				// structure
+																				// changes,
+																				// this
+																				// could
+																				// break
+
 			proxy.eval(cmd_string);
-	
-			// TODO: figure out how to get the .mdl file contents as a string so we
+
+			// TODO: figure out how to get the .mdl file contents as a string so
+			// we
 			// can pipe its output to stdout
-			
+
 			proxy.disconnect();
 		}
-		catch (MatlabInvocationException e) {
+		catch (MatlabInvocationException e)
+		{
 			System.err.println(e);
-		} catch (MatlabConnectionException e) {
+		}
+		catch (MatlabConnectionException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		finally {
+		finally
+		{
 			// What is the right pattern to handle this cleanup?
 			proxy.disconnect();
 		}
@@ -241,14 +252,19 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	/**
 	 * return the size of A matrix depending on a set of variable X
 	 */
-	public int getAMatrixSize(AutomatonMode m) {
+	public int getAMatrixSize(AutomatonMode m)
+	{
 		Integer size = m.flowDynamics.keySet().size();
-		for (String v : ha.variables) {
-			if (m.flowDynamics.containsKey(v) && m.flowDynamics.get(v).asExpression().equals(new Constant(0))) {
+		for (String v : ha.variables)
+		{
+			if (m.flowDynamics.containsKey(v)
+					&& m.flowDynamics.get(v).asExpression().equals(new Constant(0)))
+			{
 				size = size - 1;
 			}
 		}
-		if (m.flowDynamics.keySet().contains("t")) {
+		if (m.flowDynamics.keySet().contains("t"))
+		{
 			size = size - 1;
 		}
 		return size;
@@ -260,14 +276,17 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * 
 	 * @return the dynamic matrix A of the set of variable X
 	 */
-	public String convertFlowToAMatrix(AutomatonMode m) {
+	public String convertFlowToAMatrix(AutomatonMode m)
+	{
 		String rv = "";
 		// Classification cls = new Classification();
 		double[][] linearMatrix = cls.linearMatrix;
 		// Integer size = ha.variables.size();
 		Integer size = getAMatrixSize(m);
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
 				rv = rv + Double.toString(linearMatrix[j][i]) + " ";
 			}
 			rv = rv + ";";
@@ -282,7 +301,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * 
 	 * @return non zero input matrix B for each location
 	 */
-	public String convertInputToBMatrix(AutomatonMode m) {
+	public String convertInputToBMatrix(AutomatonMode m)
+	{
 		String rv = "";
 		// Classification cls = new Classification();
 		double[][] linearMatrix = cls.linearMatrix;
@@ -290,9 +310,12 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		boolean allzero = true;
 		String tmp = "";
 		Integer colLength = ha.variables.size() + ha.constants.size();
-		if (colLength > ha.variables.size()) {
-			for (int j = ha.variables.size(); j < colLength; j++) {
-				for (int i = 0; i < rowLength; i++) {
+		if (colLength > ha.variables.size())
+		{
+			for (int j = ha.variables.size(); j < colLength; j++)
+			{
+				for (int i = 0; i < rowLength; i++)
+				{
 					tmp = tmp + Double.toString(linearMatrix[i][j]) + " ";
 					if (linearMatrix[i][j] != 0)
 						allzero = false;
@@ -311,16 +334,20 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * 
 	 * @return invariant matrix C for each location
 	 */
-	public String convertInvToMatrix(AutomatonMode m) {
+	public String convertInvToMatrix(AutomatonMode m)
+	{
 		String rv = "";
 		// Classification cls = new Classification();
 		LinkedHashMap<String, Integer> varID = cls.varID;
 		Expression eInv = m.invariant;
-		for (String v : ha.variables) {
+		for (String v : ha.variables)
+		{
 			// skip all variables with non-null dynamics
 			// outputs (y = Cx) are those with non defined (havoc) dynamics
 
-			if (!(m.flowDynamics.containsKey(v)) || m.flowDynamics.get(v).asExpression().equals(new Constant(0))) {
+			if (!(m.flowDynamics.containsKey(v))
+					|| m.flowDynamics.get(v).asExpression().equals(new Constant(0)))
+			{
 
 				Expression subEquality = getSubEquality(v, eInv, null); // todo:
 																		// did
@@ -330,8 +357,10 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 																		// probably
 																		// pretty
 																		// buggy
-				for (String s : ha.variables) {
-					if (varID.get(s) < getAMatrixSize(m)) {
+				for (String s : ha.variables)
+				{
+					if (varID.get(s) < getAMatrixSize(m))
+					{
 						findInvCoefficient(s, subEquality.asOperation().getRight());
 						rv = rv + coeff + " ";
 						found = false;
@@ -350,67 +379,99 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		return rv;
 	}
 
-	private Expression getSubEquality(String v, Expression e, Expression s) {
-		if (e instanceof Variable) {
-			if (e.toString().equals(v)) {
+	private Expression getSubEquality(String v, Expression e, Expression s)
+	{
+		if (e instanceof Variable)
+		{
+			if (e.toString().equals(v))
+			{
 				return e.getParent();
-			} else {
+			}
+			else
+			{
 				return null;
 			}
-		} else if (e instanceof Constant) {
+		}
+		else if (e instanceof Constant)
+		{
 			return s;
-		} else if (e instanceof Operation) {
+		}
+		else if (e instanceof Operation)
+		{
 			s = getSubEquality(v, e.asOperation().getLeft(), s);
-			if (s != null) {
+			if (s != null)
+			{
 				return s;
 			}
 			s = getSubEquality(v, e.asOperation().getRight(), s);
-			if (s != null) {
+			if (s != null)
+			{
 				return s;
 			}
 		}
 		return null;
 	}
 
-	private void findInvCoefficient(String v, Expression e) {
+	private void findInvCoefficient(String v, Expression e)
+	{
 
-		if (!found) {
-			if (e instanceof Variable) {
-				if (e.toString().equals(v)) {
+		if (!found)
+		{
+			if (e instanceof Variable)
+			{
+				if (e.toString().equals(v))
+				{
 					coeff = "1";
 				}
-			} else if (e instanceof Constant) {
+			}
+			else if (e instanceof Constant)
+			{
 				coeff = "0";
-			} else if (e instanceof Operation) {
+			}
+			else if (e instanceof Operation)
+			{
 
 				Operation o = (Operation) e;
-				if (o.op == Operator.MULTIPLY) {
+				if (o.op == Operator.MULTIPLY)
+				{
 					Expression l = o.getLeft();
 					Expression r = o.getRight();
-					if (r instanceof Variable && l instanceof Constant) {
-						if (r.toString().equals(v)) {
+					if (r instanceof Variable && l instanceof Constant)
+					{
+						if (r.toString().equals(v))
+						{
 							coeff = Double.toString(((Constant) l).getVal());
-							if (o.getParent() != null) {
-								if (o.getParent().op == Operator.SUBTRACT && o.getParent().getRight().equals(o))
+							if (o.getParent() != null)
+							{
+								if (o.getParent().op == Operator.SUBTRACT
+										&& o.getParent().getRight().equals(o))
 									coeff = "-" + coeff;
 							}
 							found = true;
 						}
-					} else if (l instanceof Variable && r instanceof Constant) {
-						if (l.toString().equals(v)) {
+					}
+					else if (l instanceof Variable && r instanceof Constant)
+					{
+						if (l.toString().equals(v))
+						{
 							coeff = Double.toString(((Constant) r).getVal());
 							found = true;
 						}
 					}
-				} else if (o.op == Operator.ADD || o.op == Operator.SUBTRACT) {
+				}
+				else if (o.op == Operator.ADD || o.op == Operator.SUBTRACT)
+				{
 
-					if (o.getRight() instanceof Variable || o.getLeft() instanceof Variable) {
-						if (o.getRight().toString().equals(v) || o.getLeft().toString().equals(v)) {
+					if (o.getRight() instanceof Variable || o.getLeft() instanceof Variable)
+					{
+						if (o.getRight().toString().equals(v) || o.getLeft().toString().equals(v))
+						{
 							coeff = "1";
 							found = true;
 						}
 					}
-					if (o.getRight() instanceof Operation || o.getLeft() instanceof Operation) {
+					if (o.getRight() instanceof Operation || o.getLeft() instanceof Operation)
+					{
 						findInvCoefficient(v, o.getRight());
 						findInvCoefficient(v, o.getLeft());
 					}
@@ -423,14 +484,19 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * 
 	 * @return variables lower bounds
 	 */
-	public String parseInitialLowerBound(AutomatonMode m) {
+	public String parseInitialLowerBound(AutomatonMode m)
+	{
 		String rv = "";
 		LinkedHashMap<String, Integer> varID = cls.varID;
-		for (Expression ex : config.init.values()) {
+		for (Expression ex : config.init.values())
+		{
 			TreeMap<String, Interval> ranges = getBound(ex);
-			for (String s : ha.variables) {
-				if (varID.get(s) < getAMatrixSize(m)) {
-					for (Entry<String, Interval> e : ranges.entrySet()) {
+			for (String s : ha.variables)
+			{
+				if (varID.get(s) < getAMatrixSize(m))
+				{
+					for (Entry<String, Interval> e : ranges.entrySet())
+					{
 						if (e.getKey().equals(s))
 							rv = rv + Double.toString(e.getValue().min) + " ";
 					}
@@ -446,14 +512,19 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * 
 	 * @return variables upper bounds
 	 */
-	public String parseInitialUpperBound(AutomatonMode m) {
+	public String parseInitialUpperBound(AutomatonMode m)
+	{
 		String rv = "";
 		LinkedHashMap<String, Integer> varID = cls.varID;
-		for (Expression ex : config.init.values()) {
+		for (Expression ex : config.init.values())
+		{
 			TreeMap<String, Interval> ranges = getBound(ex);
-			for (String s : ha.variables) {
-				if (varID.get(s) < getAMatrixSize(m)) {
-					for (Entry<String, Interval> e : ranges.entrySet()) {
+			for (String s : ha.variables)
+			{
+				if (varID.get(s) < getAMatrixSize(m))
+				{
+					for (Entry<String, Interval> e : ranges.entrySet())
+					{
 						if (e.getKey().equals(s))
 							rv = rv + Double.toString(e.getValue().max) + " ";
 					}
@@ -469,22 +540,29 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * 
 	 * @return input bounds as a matrix
 	 */
-	public String parseInitialInputBound(AutomatonMode m) {
+	public String parseInitialInputBound(AutomatonMode m)
+	{
 		String rv = "";
 		LinkedHashMap<String, Integer> varID = cls.varID;
 		double[][] linearMatrix = cls.linearMatrix;
 		boolean allzero = true;
-		for (Expression ex : config.init.values()) {
+		for (Expression ex : config.init.values())
+		{
 			TreeMap<String, Interval> ranges = getBound(ex);
-			for (String s : ha.constants.keySet()) {
-				for (int i = 0; i < getAMatrixSize(m); i++) {
+			for (String s : ha.constants.keySet())
+			{
+				for (int i = 0; i < getAMatrixSize(m); i++)
+				{
 					if (linearMatrix[i][varID.get(s)] != 0)
 						allzero = false;
 				}
-				if (!allzero) {
-					for (Entry<String, Interval> e : ranges.entrySet()) {
+				if (!allzero)
+				{
+					for (Entry<String, Interval> e : ranges.entrySet())
+					{
 						if (e.getKey().equals(s))
-							rv = rv + Double.toString(e.getValue().min) + " " + Double.toString(e.getValue().max) + " ";
+							rv = rv + Double.toString(e.getValue().min) + " "
+									+ Double.toString(e.getValue().max) + " ";
 					}
 					rv = rv + ";";
 				}
@@ -499,16 +577,24 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * 
 	 * @return variables and constants bounds
 	 */
-	private TreeMap<String, Interval> getBound(Expression ex) {
+	private TreeMap<String, Interval> getBound(Expression ex)
+	{
 		TreeMap<String, Interval> ranges = new TreeMap<String, Interval>();
 
-		try {
-				RangeExtractor.getVariableRanges(ex, ranges);
-		} catch (RangeExtractor.EmptyRangeException e) {
+		try
+		{
+			RangeExtractor.getVariableRanges(ex, ranges);
+		}
+		catch (RangeExtractor.EmptyRangeException e)
+		{
 			throw new AutomatonExportException(e.getLocalizedMessage(), e);
-		} catch (RangeExtractor.ConstantMismatchException e) {
+		}
+		catch (RangeExtractor.ConstantMismatchException e)
+		{
 			throw new AutomatonExportException(e.getLocalizedMessage(), e);
-		} catch (UnsupportedConditionException e) {
+		}
+		catch (UnsupportedConditionException e)
+		{
 			throw new AutomatonExportException(e.getLocalizedMessage(), e);
 		}
 
@@ -519,7 +605,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * 
 	 * @return modeName to id for non-semantics preservation converter
 	 */
-	public TreeMap<String, Integer> getID(BaseComponent ha) {
+	public TreeMap<String, Integer> getID(BaseComponent ha)
+	{
 		TreeMap<String, Integer> modeNamesToIds = new TreeMap<String, Integer>();
 		int id = 1;
 		for (String modeName : ha.modes.keySet())
@@ -532,10 +619,11 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	// -------------
 
 	/**
-	 * Wrapper for a variable in Stateflow. It contains a name and an iterable
-	 * of properties to be set.
+	 * Wrapper for a variable in Stateflow. It contains a name and an iterable of properties to be
+	 * set.
 	 */
-	public class VariableWrapper {
+	public class VariableWrapper
+	{
 		// name
 		public final String name;
 		// properties
@@ -551,7 +639,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		 * @param name
 		 *            variable name
 		 */
-		public VariableWrapper(final String name) {
+		public VariableWrapper(final String name)
+		{
 			this.name = name;
 			this.props = new ArrayList<VariableProperty>(5);
 		}
@@ -568,8 +657,9 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		 * @param arrSize
 		 *            size of the array (typically an empty string)
 		 */
-		private void setStandardProperties(final String scope, final String update, final String datatype,
-				final String arrSize) {
+		private void setStandardProperties(final String scope, final String update,
+				final String datatype, final String arrSize)
+		{
 			this.props.add(new VariableProperty(SCOPE, scope));
 			this.props.add(new VariableProperty(UPDATE, update));
 			this.props.add(new VariableProperty(DATATYPE, datatype));
@@ -580,23 +670,31 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		}
 
 		@Override
-		public String toString() {
+		public String toString()
+		{
 			final StringBuilder builder = new StringBuilder();
 			builder.append("<");
 			builder.append(this.name);
 			builder.append(": ");
-			if (this.props != null) {
+			if (this.props != null)
+			{
 				final Iterator<VariableProperty> it = this.props.iterator();
-				if (it.hasNext()) {
+				if (it.hasNext())
+				{
 					builder.append(it.next().toString());
-					while (it.hasNext()) {
+					while (it.hasNext())
+					{
 						builder.append("; ");
 						builder.append(it.next().toString());
 					}
-				} else {
+				}
+				else
+				{
 					builder.append("--");
 				}
-			} else {
+			}
+			else
+			{
 				builder.append("--");
 			}
 			builder.append(">");
@@ -607,7 +705,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	/**
 	 * String tuple for variables.
 	 */
-	public class VariableProperty {
+	public class VariableProperty
+	{
 		public final String name;
 		public final String value;
 
@@ -617,13 +716,15 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		 * @param value
 		 *            property value
 		 */
-		public VariableProperty(final String name, final String value) {
+		public VariableProperty(final String name, final String value)
+		{
 			this.name = name;
 			this.value = value;
 		}
 
 		@Override
-		public String toString() {
+		public String toString()
+		{
 			final StringBuilder builder = new StringBuilder();
 			builder.append(name);
 			builder.append(" := ");
@@ -635,25 +736,30 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	/**
 	 * Lower and upper bounds wrapper for variables.
 	 */
-	public class VariableBound {
+	public class VariableBound
+	{
 		// variable name
 		final String var;
 		// equality constraint
 		final boolean isEquality;
 
-		public VariableBound(final String var, final boolean isEquality) {
+		public VariableBound(final String var, final boolean isEquality)
+		{
 			this.var = var;
 			this.isEquality = isEquality;
 		}
 
 		@Override
-		public int hashCode() {
+		public int hashCode()
+		{
 			return var.hashCode();
 		}
 
 		@Override
-		public boolean equals(Object o) {
-			if (!(o instanceof VariableBound)) {
+		public boolean equals(Object o)
+		{
+			if (!(o instanceof VariableBound))
+			{
 				return false;
 			}
 			return ((VariableBound) o).var.equals(var);
@@ -663,7 +769,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	/**
 	 * Bounds from above and below.
 	 */
-	private class IntervalBound extends VariableBound {
+	private class IntervalBound extends VariableBound
+	{
 		// bounds
 		private Expression lower;
 		private Expression upper;
@@ -676,7 +783,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		 * @param upper
 		 *            lower bound expression
 		 */
-		public IntervalBound(final String var, final Expression lower, final Expression upper) {
+		public IntervalBound(final String var, final Expression lower, final Expression upper)
+		{
 			super(var, false);
 			this.lower = lower;
 			this.upper = upper;
@@ -685,19 +793,22 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		/**
 		 * @return true iff lower bound was not set before
 		 */
-		private boolean isLowerFree() {
+		private boolean isLowerFree()
+		{
 			return (lower == null);
 		}
 
 		/**
 		 * @return true iff upper bound was not set before
 		 */
-		private boolean isUpperFree() {
+		private boolean isUpperFree()
+		{
 			return (upper == null);
 		}
 
 		@Override
-		public String toString() {
+		public String toString()
+		{
 			return var + " in [" + lower + ", " + upper + "]";
 		}
 	}
@@ -705,7 +816,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	/**
 	 * Bounds by an equality.
 	 */
-	private class EqualityBound extends VariableBound {
+	private class EqualityBound extends VariableBound
+	{
 		// equality expression (including the variable and equality)
 		private Expression expr;
 
@@ -715,13 +827,15 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		 * @param expr
 		 *            equality expression (including the variable and equality)
 		 */
-		public EqualityBound(final String var, final Expression expr) {
+		public EqualityBound(final String var, final Expression expr)
+		{
 			super(var, true);
 			this.expr = expr;
 		}
 
 		@Override
-		public String toString() {
+		public String toString()
+		{
 			return expr.toString();
 		}
 	}
@@ -729,7 +843,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	/**
 	 * Printer for Stateflow expressions.
 	 */
-	public class SimulinkStateflowExpressionPrinter extends DefaultExpressionPrinter {
+	public class SimulinkStateflowExpressionPrinter extends DefaultExpressionPrinter
+	{
 		// translate equalities to small intervals?
 		private boolean m_isIntervalEquality;
 		// add variable prefix?
@@ -739,12 +854,13 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		// epsilon variable
 		private final Variable m_epsilon;
 		/*
-		 * pretty printing mode: break AND/OR expressions exceeding this
-		 * threshold deactivated for value 0
+		 * pretty printing mode: break AND/OR expressions exceeding this threshold deactivated for
+		 * value 0
 		 */
 		private final int m_prettyPrintThreshold;
 
-		public SimulinkStateflowExpressionPrinter(final int prettyPrintThreshold) {
+		public SimulinkStateflowExpressionPrinter(final int prettyPrintThreshold)
+		{
 			super();
 			opNames.put(Operator.AND, "&&");
 			opNames.put(Operator.OR, "||");
@@ -766,8 +882,9 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		 * @param isAddEpsilon
 		 *            true iff epsilons should be added to inequalities
 		 */
-		public String print(final Expression expr, final boolean isAddPrefix, final boolean isIntervalEquality,
-				final boolean isAddEpsilon) {
+		public String print(final Expression expr, final boolean isAddPrefix,
+				final boolean isIntervalEquality, final boolean isAddEpsilon)
+		{
 			this.m_isIntervalEquality = isIntervalEquality;
 			this.m_isAddPrefix = isAddPrefix;
 			this.m_isAddEpsilon = isAddEpsilon;
@@ -776,29 +893,36 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		}
 
 		@Override
-		public String printVariable(Variable variable) {
-			if (m_isAddPrefix && (!variable.name.equals(V_eps.name))) {
+		public String printVariable(Variable variable)
+		{
+			if (m_isAddPrefix && (!variable.name.equals(V_eps.name)))
+			{
 				// add variable prefix (except for epsilon variable)
 				return PREFIX_VARIABLE + super.printVariable(variable);
-			} else {
+			}
+			else
+			{
 				return super.printVariable(variable);
 			}
 		}
 
 		@Override
-		public String printOperation(Operation operation) {
+		public String printOperation(Operation operation)
+		{
 			Operator epsilonOperator = null;
 			final Operator op = operation.getOperator();
-			switch (op) {
+			switch (op)
+			{
 			case EQUAL:
-				if (m_isIntervalEquality) {
+				if (m_isIntervalEquality)
+				{
 					/*
-					 * special handling for equalities via intervals (lhs - eps
-					 * <= rhs && lhs + eps >= rhs)
+					 * special handling for equalities via intervals (lhs - eps <= rhs && lhs + eps
+					 * >= rhs)
 					 * 
-					 * NOTE: This relies on the fact that an equality never
-					 * occurs below (as a child of) another equality, i.e., we
-					 * have no equality between Booleans as in "true == false".
+					 * NOTE: This relies on the fact that an equality never occurs below (as a child
+					 * of) another equality, i.e., we have no equality between Booleans as in
+					 * "true == false".
 					 */
 					final List<Expression> children = operation.children;
 					final Expression childLeft = children.get(0);
@@ -818,68 +942,83 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 				// NOTE: fall-through
 			case GREATER:
 			case GREATEREQUAL:
-				if (epsilonOperator == null) {
+				if (epsilonOperator == null)
+				{
 					// subtract epsilon
 					epsilonOperator = Operator.SUBTRACT;
 				}
 
-				if (m_isAddEpsilon) {
+				if (m_isAddEpsilon)
+				{
 					// either add or subtract epsilon
 					final List<Expression> children = operation.children;
-					final Operation addition = new Operation(children.get(1), epsilonOperator, m_epsilon);
+					final Operation addition = new Operation(children.get(1), epsilonOperator,
+							m_epsilon);
 					operation = new Operation(children.get(0), op, addition);
 				}
 				break;
 			case AND:
 			case OR:
 				// split conjunctions/disjunctions in pretty printing mode
-				if (m_prettyPrintThreshold > 0) {
+				if (m_prettyPrintThreshold > 0)
+				{
 					final List<Expression> children = operation.children;
-					if (children.size() != 2) {
+					if (children.size() != 2)
+					{
 						// only support binary operators
 						break;
 					}
 					/*
-					 * recursively print children first NOTE: If the children
-					 * are split, then the parents are always split, too. This
-					 * is because the String object returned has no notion of
-					 * line breaks. This is the intended behavior, however.
+					 * recursively print children first NOTE: If the children are split, then the
+					 * parents are always split, too. This is because the String object returned has
+					 * no notion of line breaks. This is the intended behavior, however.
 					 */
 					final Expression leftChild = children.get(0);
 					final String lhs = print(leftChild);
 					final Expression rightChild = children.get(1);
 					final String rhs = print(rightChild);
 
-					if (Math.min(lhs.length(), rhs.length()) >= m_prettyPrintThreshold) {
+					if (Math.min(lhs.length(), rhs.length()) >= m_prettyPrintThreshold)
+					{
 						// - decided to split the string -
 
 						// add parentheses depending on operator priority
 						final int priority = Operator.getPriority(op);
 						final boolean addParenthesesLeft = (leftChild instanceof Operation)
-								? (priority > Operator.getPriority(((Operation) leftChild).getOperator())) : false;
+								? (priority > Operator
+										.getPriority(((Operation) leftChild).getOperator()))
+								: false;
 						final boolean addParenthesesRight = (rightChild instanceof Operation)
-								? (priority > Operator.getPriority(((Operation) rightChild).getOperator())) : false;
+								? (priority > Operator
+										.getPriority(((Operation) rightChild).getOperator()))
+								: false;
 
 						// split string
 						final StringBuilder builder = new StringBuilder();
 
-						if (addParenthesesLeft) {
+						if (addParenthesesLeft)
+						{
 							builder.append("(");
 						}
 						builder.append(lhs);
-						if (addParenthesesLeft) {
+						if (addParenthesesLeft)
+						{
 							builder.append(") ");
-						} else {
+						}
+						else
+						{
 							builder.append(" ");
 						}
 						builder.append(opNames.get(op));
 						builder.append(" ...");
 						builder.append(lineSeparator);
-						if (addParenthesesRight) {
+						if (addParenthesesRight)
+						{
 							builder.append("(");
 						}
 						builder.append(rhs);
-						if (addParenthesesRight) {
+						if (addParenthesesRight)
+						{
 							builder.append(")");
 						}
 						return builder.toString();
@@ -898,7 +1037,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	/**
 	 * Standard constructor (does not support every feature).
 	 */
-	public SimulinkStateflowPrinter() {
+	public SimulinkStateflowPrinter()
+	{
 		this.m_printer = new SimulinkStateflowExpressionPrinter(0);
 		this.m_randoms = 0;
 		Expression.expressionPrinter = m_printer;
@@ -927,8 +1067,9 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * @param prettyPrintThreshold
 	 *            threshold for breaking long expressions
 	 */
-	public SimulinkStateflowPrinter(final Iterable<String> variableNames, final boolean isAddEpsilon,
-			final int prettyPrintThreshold) {
+	public SimulinkStateflowPrinter(final Iterable<String> variableNames,
+			final boolean isAddEpsilon, final int prettyPrintThreshold)
+	{
 		this.m_printer = new SimulinkStateflowExpressionPrinter(prettyPrintThreshold);
 		this.m_randoms = 0;
 		Expression.expressionPrinter = m_printer;
@@ -937,9 +1078,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		StringBuilder builder;
 
 		/*
-		 * forces unix-style line endings (Matlab requires this) (DID NOT WORK
-		 * TO SET to override System.lineSeparator(), maybe have to use old
-		 * style of System.get etc.)
+		 * forces unix-style line endings (Matlab requires this) (DID NOT WORK TO SET to override
+		 * System.lineSeparator(), maybe have to use old style of System.get etc.)
 		 */
 		// System.setProperty("line.separator", "\n");
 
@@ -1107,7 +1247,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	// ------------- interface methods -------------
 
 	@Override
-	protected void printAutomaton() {
+	protected void printAutomaton()
+	{
 		this.ha = (BaseComponent) config.root;
 		Expression.expressionPrinter = new SimulinkStateflowExpressionPrinter(0);
 
@@ -1120,33 +1261,36 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	}
 
 	@Override
-	public String getToolName() {
+	public String getToolName()
+	{
 		return "Stateflow_converter";
 	}
 
 	@Override
-	public String getCommandLineFlag() {
-		return "-stateflow";
+	public String getCommandLineFlag()
+	{
+		return "stateflow";
 	}
 
 	@Override
-	protected String getCommentCharacter() {
+	protected String getCommentPrefix()
+	{
 		return "%";
 	}
 
 	// ------------- methods for the main components of an HA -------------
 
 	/**
-	 * Converts the dynamics of a mode to semantics-preserving strings. For each
-	 * variable that is changed, the returned object contains one string
-	 * determining the dynamics. Additionally, the output variables are
-	 * assigned.
+	 * Converts the dynamics of a mode to semantics-preserving strings. For each variable that is
+	 * changed, the returned object contains one string determining the dynamics. Additionally, the
+	 * output variables are assigned.
 	 * 
 	 * @param mode
 	 *            automaton mode
 	 * @return iterable of Stateflow strings
 	 */
-	private Iterable<String> getDynamicsIterable(final AutomatonMode mode) {
+	private Iterable<String> getDynamicsIterable(final AutomatonMode mode)
+	{
 		return getUpdate(mode.flowDynamics, PREFIX_VARIABLE, PREFIX_OUTPUT, "_dot = ");
 	}
 
@@ -1157,7 +1301,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 *            automaton mode
 	 * @return Stateflow string
 	 */
-	public String getInvariantString(final AutomatonMode mode) {
+	public String getInvariantString(final AutomatonMode mode)
+	{
 		return getCondition(mode.invariant);
 	}
 
@@ -1170,28 +1315,38 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 *            constants map
 	 * @return iterable of Stateflow strings
 	 */
-	private Iterable<String> getInitIterable(final String modeName, final Map<String, Double> constants) {
+	private Iterable<String> getInitIterable(final String modeName,
+			final Map<String, Double> constants)
+	{
 		final Expression initExpr = config.init.get(modeName);
 		final List<String> inits = new LinkedList<String>();
 		// no initial location
-		if (initExpr == null) {
+		if (initExpr == null)
+		{
 			// TODO What happens for NOP initial conditions like "true"?
 			return inits;
 		}
 
 		final Iterable<VariableBound> bounds = getBounds(getConjuncts(initExpr), constants);
 		final boolean isBounded = checkBoundedness(bounds);
-		if (isBounded) {
+		if (isBounded)
+		{
 			// System.out.println("The variables are bounded.");
-		} else {
+		}
+		else
+		{
 			System.err.println("The variables are not bounded.");
 		}
 		int randoms = 0;
-		for (final VariableBound bound : bounds) {
-			if (bound instanceof EqualityBound) {
+		for (final VariableBound bound : bounds)
+		{
+			if (bound instanceof EqualityBound)
+			{
 				// equality constraint
 				inits.add(m_printer.print(((EqualityBound) bound).expr, true, false, false) + ";");
-			} else if (bound instanceof IntervalBound) {
+			}
+			else if (bound instanceof IntervalBound)
+			{
 				// interval constraint
 				final IntervalBound intBound = (IntervalBound) bound;
 				final StringBuilder builder = new StringBuilder();
@@ -1207,7 +1362,9 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 				builder.append(m_printer.print(intBound.upper, true, false, false));
 				builder.append(");");
 				inits.add(builder.toString());
-			} else {
+			}
+			else
+			{
 				throw new IllegalArgumentException("Unsupported bound type.");
 			}
 		}
@@ -1222,7 +1379,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 *            automaton transition
 	 * @return Stateflow string
 	 */
-	public String getGuardString(final AutomatonTransition transition) {
+	public String getGuardString(final AutomatonTransition transition)
+	{
 		return getCondition(transition.guard);
 	}
 
@@ -1233,26 +1391,27 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 *            automaton transition
 	 * @return iterable of Stateflow strings
 	 */
-	private Iterable<String> getAssignmentIterable(final AutomatonTransition transition) {
+	private Iterable<String> getAssignmentIterable(final AutomatonTransition transition)
+	{
 		return getUpdate(transition.reset, PREFIX_ASSIGNMENT, PREFIX_VARIABLE, " = ");
 	}
 
 	/**
-	 * Converts the transition assignment to a semantics-preserving string.
-	 * Convenience unifier of strings returned by
-	 * {@link getAssignmentIterable()}.
+	 * Converts the transition assignment to a semantics-preserving string. Convenience unifier of
+	 * strings returned by {@link getAssignmentIterable()}.
 	 * 
 	 * @param transition
 	 *            automaton transition
 	 * @return Stateflow string
 	 */
-	public String getAssignmentString(final AutomatonTransition transition) {
+	public String getAssignmentString(final AutomatonTransition transition)
+	{
 		return unifyStrings(getAssignmentIterable(transition));
 	}
 
 	/**
-	 * Converts an update expression to semantics-preserving strings. An update
-	 * expression is an expression like a flow or an assignment.
+	 * Converts an update expression to semantics-preserving strings. An update expression is an
+	 * expression like a flow or an assignment.
 	 * 
 	 * @param map
 	 *            map from variable name to update expression
@@ -1263,23 +1422,30 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * @param connector1
 	 *            connector for first
 	 */
-	private Iterable<String> getUpdate(final Map<String, ExpressionInterval> map, final String prefix1,
-			final String prefix2, final String connector1) {
+	private Iterable<String> getUpdate(final Map<String, ExpressionInterval> map,
+			final String prefix1, final String prefix2, final String connector1)
+	{
 		// empty case
-		if (map.isEmpty()) {
+		if (map.isEmpty())
+		{
 			return new LinkedList<String>();
 		}
 
 		final List<String> list1 = new ArrayList<String>(2 * map.size());
 		final List<String> list2 = new ArrayList<String>(map.size());
 
-		for (final Entry<String, ExpressionInterval> entry : map.entrySet()) {
+		for (final Entry<String, ExpressionInterval> entry : map.entrySet())
+		{
 			final String var = entry.getKey();
-			final String value = m_printer.print(entry.getValue().asExpression(), true, false, false);
-			if (!isSP) {
+			final String value = m_printer.print(entry.getValue().asExpression(), true, false,
+					false);
+			if (!isSP)
+			{
 				final String valueNoSP = m_printer.print(entry.getValue().asExpression());
 				list1.add(var + connector1 + valueNoSP + ";");
-			} else {
+			}
+			else
+			{
 				list1.add(prefix1 + var + connector1 + value + ";");
 				list2.add(prefix2 + var + " = " + prefix1 + var + ";");
 			}
@@ -1290,26 +1456,29 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	}
 
 	/**
-	 * Converts a conditional expression to a semantics-preserving string. A
-	 * conditional expression is an expression like an invariant or a guard.
+	 * Converts a conditional expression to a semantics-preserving string. A conditional expression
+	 * is an expression like an invariant or a guard.
 	 * 
 	 * @param expr
 	 *            conditional expression
 	 */
-	private String getCondition(final Expression expr) {
+	private String getCondition(final Expression expr)
+	{
 		// empty case
-		if (expr == null) {
+		if (expr == null)
+		{
 			return "";
 		}
-		if (!isSP) {
+		if (!isSP)
+		{
 			return m_printer.print(expr);
 		}
 		return m_printer.print(expr, true, true, IS_ADD_EPS);
 	}
 
 	/*
-	 * ----------- methods for creating the actual Stateflow strings -----------
-	 * ----------- (states, junctions, and transition labels) -----------
+	 * ----------- methods for creating the actual Stateflow strings ----------- -----------
+	 * (states, junctions, and transition labels) -----------
 	 */
 
 	/**
@@ -1322,7 +1491,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * @param numTransOut
 	 *            number of outgoing transitions
 	 */
-	public String getStateInLabel(final AutomatonMode mode, final int modeId, final int numTransOut) {
+	public String getStateInLabel(final AutomatonMode mode, final int modeId, final int numTransOut)
+	{
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(mode.name);
@@ -1333,7 +1503,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		builder.append(";");
 		builder.append(lineSeparator);
 
-		if (numTransOut > 0) {
+		if (numTransOut > 0)
+		{
 			final String sizeString = Integer.toString(numTransOut);
 			builder.append(V_transArray.name);
 			builder.append(" = permuteA(");
@@ -1348,7 +1519,9 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 			builder.append(" = ");
 			builder.append(sizeString);
 			builder.append(";");
-		} else {
+		}
+		else
+		{
 			builder.append(V_transIdx.name);
 			builder.append(" = 0;");
 		}
@@ -1362,21 +1535,25 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * @param mode
 	 *            automaton mode
 	 */
-	public String getStateDwellLabel(final AutomatonMode mode) {
+	public String getStateDwellLabel(final AutomatonMode mode)
+	{
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(mode.name);
-		if (isSP) {
+		if (isSP)
+		{
 			builder.append("_dwell");
 		}
 		builder.append(lineSeparator);
 		builder.append("du:");
 		builder.append(lineSeparator);
-		if (isSP) {
+		if (isSP)
+		{
 			builder.append(STATE_DWELL_STRING);
 		}
 		final Iterator<String> it = getDynamicsIterable(mode).iterator();
-		while (it.hasNext()) {
+		while (it.hasNext())
+		{
 			builder.append(lineSeparator);
 			builder.append(it.next());
 		}
@@ -1390,7 +1567,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * @param mode
 	 *            automaton mode
 	 */
-	public String getStateChooseLabel(final AutomatonMode mode) {
+	public String getStateChooseLabel(final AutomatonMode mode)
+	{
 		return mode.name + STATE_CHOOSE_STRING;
 	}
 
@@ -1402,7 +1580,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * @param numInits
 	 *            number of initial locations
 	 */
-	public String getTransitionInitLabel(final int numTransMax, final int numInits) {
+	public String getTransitionInitLabel(final int numTransMax, final int numInits)
+	{
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append("{");
@@ -1423,11 +1602,13 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		builder.append(lineSeparator);
 
 		// don't add if no transitions
-		if (numTransMax > 0) {
+		if (numTransMax > 0)
+		{
 			builder.append(V_transArray.name);
 			builder.append(" = ");
 			builder.append("[1");
-			for (int i = 2; i <= numTransMax; ++i) {
+			for (int i = 2; i <= numTransMax; ++i)
+			{
 				builder.append(", ");
 				builder.append(i);
 			}
@@ -1436,16 +1617,20 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		}
 
 		builder.append(V_init.name);
-		if (numInits > 1) {
+		if (numInits > 1)
+		{
 			// more than one initial location
 			builder.append(" = round(random(");
 			builder.append(V_rand.name);
 			builder.append("(1), 0.5, ");
 			builder.append(numInits);
 			builder.append(".499999));");
-		} else {
+		}
+		else
+		{
 			// one initial location
-			if (numInits != 1) {
+			if (numInits != 1)
+			{
 				throw new IllegalArgumentException("There was no initial location specified.");
 			}
 			builder.append(" = 1;");
@@ -1466,7 +1651,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 *            constants map
 	 */
 	public String getTransitionInit2inLabel(final AutomatonMode mode, final int initIdx,
-			final Map<String, Double> constants) {
+			final Map<String, Double> constants)
+	{
 		return getTransitionInit2inLabel(mode.name, initIdx, constants);
 	}
 
@@ -1481,13 +1667,16 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 *            constants map
 	 */
 	public String getTransitionInit2inLabel(final String modeName, final int initIdx,
-			final Map<String, Double> constants) {
+			final Map<String, Double> constants)
+	{
 		Iterator<String> it = getInitIterable(modeName, constants).iterator();
 
 		// only write the label if the mode is initial
-		if (it.hasNext()) {
+		if (it.hasNext())
+		{
 			final StringBuilder builder = new StringBuilder();
-			if (isSP) {
+			if (isSP)
+			{
 				// condition: chosen transition number equals index
 				builder.append("[");
 				builder.append(V_init.name);
@@ -1500,14 +1689,17 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 			builder.append(lineSeparator);
 			builder.append("{");
 			builder.append(it.next());
-			while (it.hasNext()) {
+			while (it.hasNext())
+			{
 				builder.append(lineSeparator);
 				builder.append(it.next());
 			}
 			builder.append("}");
 
 			return builder.toString();
-		} else {
+		}
+		else
+		{
 			return "";
 		}
 	}
@@ -1515,7 +1707,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	/**
 	 * Returns the label for the transition 'dwell state -> leave junction'.
 	 */
-	public String getTransitionDwell2leaveLabel() {
+	public String getTransitionDwell2leaveLabel()
+	{
 		return TRANS_DWELL2LEAVE_STRING;
 	}
 
@@ -1525,7 +1718,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * @param mode
 	 *            automaton mode
 	 */
-	public String getTransitionDwell2backtrackLabel(final AutomatonMode mode) {
+	public String getTransitionDwell2backtrackLabel(final AutomatonMode mode)
+	{
 		final StringBuilder builder = new StringBuilder();
 		builder.append("[~(");
 		builder.append(getInvariantString(mode));
@@ -1536,62 +1730,67 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	/**
 	 * Returns the label for the transition 'leave junction -> dwell state'.
 	 */
-	public String getTransitionLeave2dwellLabel() {
+	public String getTransitionLeave2dwellLabel()
+	{
 		return TRANS_LEAVE2DWELL_STRING;
 	}
 
 	/**
 	 * Returns the label for the transition 'choose state -> dwell state'.
 	 */
-	public String getTransitionChoose2dwellLabel() {
+	public String getTransitionChoose2dwellLabel()
+	{
 		return TRANS_CHOOSES2DWELL_STRING;
 	}
 
 	/**
 	 * Returns the label for the transition 'choose junction -> choose state'.
 	 */
-	public String getTransitionChooseJ2chooseLabel() {
+	public String getTransitionChooseJ2chooseLabel()
+	{
 		return TRANS_CHOOSEJ2CHOOSES_STRING;
 	}
 
 	/**
-	 * Returns the label for the transition 'choose state -> transition choose
-	 * junction'.
+	 * Returns the label for the transition 'choose state -> transition choose junction'.
 	 */
-	public String getTransitionChoose2chooseJLabel() {
+	public String getTransitionChoose2chooseJLabel()
+	{
 		return TRANS_CHOOSES2CHOOSEJ_STRING;
 	}
 
 	/**
-	 * Returns the label for the transition 'time choose junction -> dwell
-	 * state'.
+	 * Returns the label for the transition 'time choose junction -> dwell state'.
 	 */
-	public String getTransitionChooseTime2dwellLabel() {
+	public String getTransitionChooseTime2dwellLabel()
+	{
 		return TRANS_CHOOSEJ2DWELL_STRING;
 	}
 
 	/**
 	 * Returns the label for the transition 'entry junction -> dwell state'.
 	 */
-	public String getTransitionInJ2dwellLabel() {
+	public String getTransitionInJ2dwellLabel()
+	{
 		return TRANS_IN2DWELL_STRING;
 	}
 
 	/**
 	 * Returns the label for the transition 'backtrack junction -> dwell state'.
 	 */
-	public String getTransitionBacktrack2dwellLabel() {
+	public String getTransitionBacktrack2dwellLabel()
+	{
 		return TRANS_BACKTRACK2DWELL_STRING;
 	}
 
 	/**
-	 * Returns the label for the transition 'leave junction -> transition
-	 * junction'.
+	 * Returns the label for the transition 'leave junction -> transition junction'.
 	 * 
 	 * @param transitionIndex
 	 *            index of the transition
 	 */
-	public String getTransitionLeave2transLabel(final int transitionIndex) {
+	public String getTransitionLeave2transLabel(final int transitionIndex)
+	{
 		final StringBuilder builder = new StringBuilder();
 		builder.append(TRANS_LEAVE2TRANS_STRING);
 		builder.append(transitionIndex);
@@ -1600,14 +1799,14 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	}
 
 	/**
-	 * Returns the label for the transition 'transition junction -> entry
-	 * state'. A transition may contain a guard and an assignment, and the
-	 * target location may have an invariant.
+	 * Returns the label for the transition 'transition junction -> entry state'. A transition may
+	 * contain a guard and an assignment, and the target location may have an invariant.
 	 * 
 	 * @param transition
 	 *            automaton transition
 	 */
-	public String getTransitionTrans2inLabel(final AutomatonTransition transition) {
+	public String getTransitionTrans2inLabel(final AutomatonTransition transition)
+	{
 		// guard string
 		final String guard = getGuardString(transition);
 
@@ -1621,43 +1820,64 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 
 		// construct the condition string
 		StringBuilder condition = new StringBuilder();
-		if (hasInvariant) {
-			if (hasGuard) {
+		if (hasInvariant)
+		{
+			if (hasGuard)
+			{
 				condition.append("[");
 				condition.append(guard);
 				condition.append(" && ...");
 				condition.append(lineSeparator);
-			} else {
+			}
+			else
+			{
 				condition.append("[");
 			}
-			if (hasAssignment) {
+			if (hasAssignment)
+			{
 				condition.append(getWpString(transition));
 				condition.append("]");
-			} else {
+			}
+			else
+			{
 				condition.append(getInvariantString(transition.to));
 				condition.append("]");
 			}
-		} else {
-			if (hasGuard) {
+		}
+		else
+		{
+			if (hasGuard)
+			{
 				condition.append("[" + guard + "]");
-			} else {
+			}
+			else
+			{
 				// nothing, builder is empty
 			}
 		}
 
 		// construct the final string
-		if (condition.length() > 0) {
-			if (hasAssignment) {
+		if (condition.length() > 0)
+		{
+			if (hasAssignment)
+			{
 				condition.append(lineSeparator);
 				condition.append(assignment);
 				return condition.toString();
-			} else {
+			}
+			else
+			{
 				return condition.toString();
 			}
-		} else {
-			if (hasAssignment) {
+		}
+		else
+		{
+			if (hasAssignment)
+			{
 				return assignment;
-			} else {
+			}
+			else
+			{
 				return "";
 			}
 		}
@@ -1671,8 +1891,10 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * @param expr
 	 *            expression in conjunctive normal form
 	 */
-	private Iterable<Operation> getConjuncts(final Expression expr) {
-		if (!(expr instanceof Operation)) {
+	private Iterable<Operation> getConjuncts(final Expression expr)
+	{
+		if (!(expr instanceof Operation))
+		{
 			throw new IllegalArgumentException("The formula should be a proper operation.");
 		}
 
@@ -1681,15 +1903,19 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		final LinkedList<Operation> stack = new LinkedList<Operation>();
 		stack.push((Operation) expr);
 
-		while (!stack.isEmpty()) {
+		while (!stack.isEmpty())
+		{
 			final Operation formula = stack.pop();
-			if (formula.getOperator() == Operator.AND) {
+			if (formula.getOperator() == Operator.AND)
+			{
 				// conjunction, put the conjuncts on the stack
-				assert((formula.getLeft() instanceof Operation)
-						&& (formula.getRight() instanceof Operation)) : "The subformulae should be proper operations.";
+				assert ((formula.getLeft() instanceof Operation) && (formula
+						.getRight() instanceof Operation)) : "The subformulae should be proper operations.";
 				stack.push((Operation) formula.getRight());
 				stack.push((Operation) formula.getLeft());
-			} else {
+			}
+			else
+			{
 				// no conjunction, assume there is none anymore
 				conjuncts.add(formula);
 			}
@@ -1699,22 +1925,20 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	}
 
 	/**
-	 * Reads variable bounds from a series of conjuncts and puts them into an
-	 * internal format.
+	 * Reads variable bounds from a series of conjuncts and puts them into an internal format.
 	 * 
-	 * Also, equality bounds are sorted such that the left-hand side is a
-	 * variable. Especially, "constant assignments" like <code>const = 5</code>
-	 * are removed, as constants are cared for at another place already.
+	 * Also, equality bounds are sorted such that the left-hand side is a variable. Especially,
+	 * "constant assignments" like <code>const = 5</code> are removed, as constants are cared for at
+	 * another place already.
 	 * 
-	 * NOTE: We assume an "intelligent" ordering like a typical assignment in
-	 * programming languages. That is, cases like
-	 * <code>var2 = var1 & var2 = 5</code> must be given in the form
-	 * <code>var2 = 5 & var1 = var2</code> so we can write
-	 * <code>var2 = 5; var1 := var2</code> in a sequential manner.
+	 * NOTE: We assume an "intelligent" ordering like a typical assignment in programming languages.
+	 * That is, cases like <code>var2 = var1 & var2 = 5</code> must be given in the form
+	 * <code>var2 = 5 & var1 = var2</code> so we can write <code>var2 = 5; var1 := var2</code> in a
+	 * sequential manner.
 	 * 
-	 * TODO The above could be supported, but takes some effort and is not
-	 * likely to be needed at the moment. A way to implement it is to collect
-	 * all elements which are equal and find a suitable topological ordering.
+	 * TODO The above could be supported, but takes some effort and is not likely to be needed at
+	 * the moment. A way to implement it is to collect all elements which are equal and find a
+	 * suitable topological ordering.
 	 * 
 	 * NOTE: Strict and non-strict bounds (< vs. <=) are handled the same way.
 	 * 
@@ -1724,10 +1948,12 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 *            constants map
 	 */
 	private Iterable<VariableBound> getBounds(final Iterable<Operation> expressions,
-			final Map<String, Double> constants) {
+			final Map<String, Double> constants)
+	{
 		final LinkedHashMap<String, VariableBound> bounds = new LinkedHashMap<String, VariableBound>();
 
-		loop: for (final Operation conjunct : expressions) {
+		loop: for (final Operation conjunct : expressions)
+		{
 			final Expression lhs = conjunct.getLeft();
 			final Expression rhs = conjunct.getRight();
 
@@ -1735,66 +1961,86 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 			final Expression bound;
 
 			/*
-			 * Check that either the lhs or the rhs is of type
-			 * <code>Variable</code> and that the name does not appear in the
-			 * constants map (i.e. it is a non-constant variable).
+			 * Check that either the lhs or the rhs is of type <code>Variable</code> and that the
+			 * name does not appear in the constants map (i.e. it is a non-constant variable).
 			 */
 			final boolean isVarLeft;
 			boolean isConstantVariable = false;
-			if (lhs instanceof Variable) {
+			if (lhs instanceof Variable)
+			{
 				varName = ((Variable) lhs).name;
 				isVarLeft = !(constants.containsKey(varName));
 				isConstantVariable = true;
-			} else {
+			}
+			else
+			{
 				isVarLeft = false;
 			}
-			if (isVarLeft) {
+			if (isVarLeft)
+			{
 				bound = rhs;
-			} else {
+			}
+			else
+			{
 				final boolean isVarRight;
-				if (rhs instanceof Variable) {
+				if (rhs instanceof Variable)
+				{
 					varName = ((Variable) rhs).name;
 					isVarRight = !(constants.containsKey(varName));
 					isConstantVariable = true;
-				} else {
+				}
+				else
+				{
 					isVarRight = false;
 				}
 
-				if (isVarRight) {
+				if (isVarRight)
+				{
 					bound = lhs;
-				} else {
-					if (isConstantVariable) {
+				}
+				else
+				{
+					if (isConstantVariable)
+					{
 						/*
-						 * One of the expressions was a constant variable. Here
-						 * we can simply ignore the expression.
+						 * One of the expressions was a constant variable. Here we can simply ignore
+						 * the expression.
 						 */
 						// System.out.println("Skipping initial expression: " +
 						// conjunct);
 						continue loop;
-					} else {
+					}
+					else
+					{
 						throw new IllegalArgumentException(
 								"One side of an operation must be a (non-constant) " + "variable.");
 					}
 				}
 			}
-			assert(varName != null) : "The null case should lead to an exception.";
+			assert (varName != null) : "The null case should lead to an exception.";
 
 			final boolean isLess;
 
-			switch (conjunct.getOperator()) {
+			switch (conjunct.getOperator())
+			{
 			case EQUAL:
 				// equality constraint
 				final EqualityBound eqBound;
-				if (isVarLeft) {
+				if (isVarLeft)
+				{
 					// use original equality
 					eqBound = new EqualityBound(varName, conjunct);
-				} else {
+				}
+				else
+				{
 					// swap variable to the left
 					eqBound = new EqualityBound(varName, new Operation(rhs, Operator.EQUAL, lhs));
 				}
 				final VariableBound oldVal = bounds.put(varName, eqBound);
-				if (oldVal != null) {
-					throw new IllegalArgumentException("Equality must not be specified more that once.");
+				if (oldVal != null)
+				{
+					throw new IllegalArgumentException(
+							"Equality must not be specified more that once.");
 				}
 				continue loop;
 			case LESS:
@@ -1813,13 +2059,16 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 
 			// bounds handling
 			final boolean isLowerBound;
-			if (isVarLeft) {
+			if (isVarLeft)
+			{
 				// x <> e
 				isLowerBound = !isLess;
 				/*
 				 * isLess: x < e !isLess: x > e
 				 */
-			} else {
+			}
+			else
+			{
 				// e <> x
 				isLowerBound = isLess;
 				/*
@@ -1829,29 +2078,44 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 
 			// set new bound
 			final VariableBound oldVal = bounds.get(varName);
-			if (oldVal == null) {
+			if (oldVal == null)
+			{
 				final Expression lower, upper;
-				if (isLowerBound) {
+				if (isLowerBound)
+				{
 					lower = bound;
 					upper = null;
-				} else {
+				}
+				else
+				{
 					lower = null;
 					upper = bound;
 				}
 				bounds.put(varName, new IntervalBound(varName, lower, upper));
-			} else {
-				if (oldVal instanceof EqualityBound) {
-					throw new IllegalArgumentException("Bounds must not be specified more that once.");
+			}
+			else
+			{
+				if (oldVal instanceof EqualityBound)
+				{
+					throw new IllegalArgumentException(
+							"Bounds must not be specified more that once.");
 				}
 				final IntervalBound oldInterval = (IntervalBound) oldVal;
-				if (isLowerBound) {
-					if (!oldInterval.isLowerFree()) {
-						throw new IllegalArgumentException("Bounds must not be specified more that once.");
+				if (isLowerBound)
+				{
+					if (!oldInterval.isLowerFree())
+					{
+						throw new IllegalArgumentException(
+								"Bounds must not be specified more that once.");
 					}
 					oldInterval.lower = bound;
-				} else {
-					if (!oldInterval.isUpperFree()) {
-						throw new IllegalArgumentException("Bounds must not be specified more that once.");
+				}
+				else
+				{
+					if (!oldInterval.isUpperFree())
+					{
+						throw new IllegalArgumentException(
+								"Bounds must not be specified more that once.");
 					}
 					oldInterval.upper = bound;
 				}
@@ -1868,15 +2132,21 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 *            variable bounds
 	 * @return true iff all variables are bounded from above and below
 	 */
-	private boolean checkBoundedness(final Iterable<VariableBound> bounds) {
-		for (final VariableBound bound : bounds) {
+	private boolean checkBoundedness(final Iterable<VariableBound> bounds)
+	{
+		for (final VariableBound bound : bounds)
+		{
 			// equality constraint
-			if (bound instanceof EqualityBound) {
-				assert(((EqualityBound) bound).expr != null) : "Equality should be set.";
+			if (bound instanceof EqualityBound)
+			{
+				assert (((EqualityBound) bound).expr != null) : "Equality should be set.";
 				continue;
-			} else {
+			}
+			else
+			{
 				final IntervalBound intBound = (IntervalBound) bound;
-				if ((intBound.lower == null) || (intBound.upper == null)) {
+				if ((intBound.lower == null) || (intBound.upper == null))
+				{
 					return false;
 				}
 			}
@@ -1891,26 +2161,30 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 *            sequence of strings
 	 * @return single string containing one line for each original string
 	 */
-	private String unifyStrings(Iterable<String> strings) {
+	private String unifyStrings(Iterable<String> strings)
+	{
 		final Iterator<String> it = strings.iterator();
-		if (it.hasNext()) {
+		if (it.hasNext())
+		{
 			final StringBuilder builder = new StringBuilder();
 			builder.append(it.next());
-			while (it.hasNext()) {
+			while (it.hasNext())
+			{
 				builder.append(lineSeparator);
 				builder.append(it.next());
 			}
 			return builder.toString();
-		} else {
+		}
+		else
+		{
 			return "";
 		}
 	}
 
 	/**
-	 * Recursively applies substitution to an expression. This method converts
-	 * the input expression into an expression where each occurrence of a
-	 * variable is replaced by the respective expression defined in the
-	 * substitution map.
+	 * Recursively applies substitution to an expression. This method converts the input expression
+	 * into an expression where each occurrence of a variable is replaced by the respective
+	 * expression defined in the substitution map.
 	 * 
 	 * @param expr
 	 *            raw expression
@@ -1919,21 +2193,30 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * @return the expression after applying substitution
 	 */
 	private Expression substitution(final Expression expr,
-			final LinkedHashMap<String, ExpressionInterval> var2replace) {
+			final LinkedHashMap<String, ExpressionInterval> var2replace)
+	{
 		final Expression outExpr;
-		if (expr instanceof Variable) {
+		if (expr instanceof Variable)
+		{
 			final ExpressionInterval replace = var2replace.get(((Variable) expr).name);
-			if (replace != null) {
+			if (replace != null)
+			{
 				outExpr = replace.asExpression();
-			} else {
+			}
+			else
+			{
 				outExpr = expr;
 			}
-		} else if (expr instanceof Operation) {
+		}
+		else if (expr instanceof Operation)
+		{
 			final Operation op = (Operation) expr;
 			final Expression lhs = substitution(op.getLeft(), var2replace);
 			final Expression rhs = substitution(op.getRight(), var2replace);
 			outExpr = new Operation(lhs, op.getOperator(), rhs);
-		} else {
+		}
+		else
+		{
 			outExpr = expr;
 		}
 
@@ -1943,7 +2226,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	/**
 	 * Returns the maximum number of random variables occurring.
 	 */
-	public int getRandomNumber() {
+	public int getRandomNumber()
+	{
 		return m_randoms;
 	}
 
@@ -1955,13 +2239,17 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 * @param vars
 	 *            variables
 	 */
-	private String getStoreString(final boolean isStore, final Iterable<String> vars) {
+	private String getStoreString(final boolean isStore, final Iterable<String> vars)
+	{
 		// set correct prefixes
 		String LEFT, RIGHT;
-		if (isStore) {
+		if (isStore)
+		{
 			LEFT = PREFIX_ASSIGNMENT;
 			RIGHT = PREFIX_VARIABLE;
-		} else {
+		}
+		else
+		{
 			LEFT = PREFIX_VARIABLE;
 			RIGHT = PREFIX_ASSIGNMENT;
 		}
@@ -1972,7 +2260,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		final StringBuilder strOut = new StringBuilder();
 
 		final Iterator<String> it = vars.iterator();
-		while (it.hasNext()) {
+		while (it.hasNext())
+		{
 			String var = it.next();
 			strNormal.append(LEFT);
 			strNormal.append(var);
@@ -1993,10 +2282,13 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 
 		strNormal.append(strOut);
 
-		if (isStore) {
+		if (isStore)
+		{
 			LEFT = V_tTmp.name;
 			RIGHT = V_t.name;
-		} else {
+		}
+		else
+		{
 			LEFT = V_t.name;
 			RIGHT = V_tTmp.name;
 		}
@@ -2013,7 +2305,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 		strNormal.append(V_backtrack.name);
 		strNormal.append(" = ");
 		strNormal.append(V_backtrack.name);
-		if (isStore) {
+		if (isStore)
+		{
 			strNormal.append(" - 1;");
 
 			strNormal.append(lineSeparator);
@@ -2021,7 +2314,9 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 			strNormal.append(" = ");
 			strNormal.append(V_maxT.name);
 			strNormal.append(";");
-		} else {
+		}
+		else
+		{
 			strNormal.append(" + 1;");
 		}
 
@@ -2029,25 +2324,27 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	}
 
 	/**
-	 * Computes the weakest precondition string for an invariant and an
-	 * assignment. Given a transition whose assignment is non-empty and whose
-	 * target location has a non-empty invariant, the condition under which the
-	 * transition can be taken is given by the weakest precondition of the
-	 * invariant I under the assignment A, wp(I, A).
+	 * Computes the weakest precondition string for an invariant and an assignment. Given a
+	 * transition whose assignment is non-empty and whose target location has a non-empty invariant,
+	 * the condition under which the transition can be taken is given by the weakest precondition of
+	 * the invariant I under the assignment A, wp(I, A).
 	 * 
-	 * wp(I, A) can be computed by substituting each occurrence of a variable x
-	 * assigned in A via 'x = e' by the expression e.
+	 * wp(I, A) can be computed by substituting each occurrence of a variable x assigned in A via 'x
+	 * = e' by the expression e.
 	 * 
 	 * Example: A == x = x + 1 I == x - y > 0 ==> wp(I, A) == (x + 1) - y > 0
 	 * 
 	 * @param transition
 	 *            automaton transition
 	 */
-	private String getWpString(final AutomatonTransition transition) {
-		if (transition.to.invariant == null) {
+	private String getWpString(final AutomatonTransition transition)
+	{
+		if (transition.to.invariant == null)
+		{
 			throw new IllegalArgumentException("The invariant should be non-empty.");
 		}
-		if (transition.reset.isEmpty()) {
+		if (transition.reset.isEmpty())
+		{
 			throw new IllegalArgumentException("The assignment should be non-empty.");
 		}
 
@@ -2056,13 +2353,11 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	}
 
 	/**
-	 * Returns the auxiliary variables introduced by the translation. This
-	 * function can only be called after the number of maximum transitions was
-	 * found.
+	 * Returns the auxiliary variables introduced by the translation. This function can only be
+	 * called after the number of maximum transitions was found.
 	 * 
-	 * NOTE: A call to this function initializes some data structures. If the
-	 * function is called more than once, it should be changed to store the
-	 * variables to avoid recomputation efforts.
+	 * NOTE: A call to this function initializes some data structures. If the function is called
+	 * more than once, it should be changed to store the variables to avoid recomputation efforts.
 	 * 
 	 * @param numTransMax
 	 *            maximum number of transitions
@@ -2070,7 +2365,8 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 	 *            maximum number of random variables used
 	 * @return iterator over all auxiliary variables
 	 */
-	public Iterator<VariableWrapper> getVariables(final int numTransMax, final int numRandMax) {
+	public Iterator<VariableWrapper> getVariables(final int numTransMax, final int numRandMax)
+	{
 		final String SCOPE_L = "Local";
 		final String SCOPE_O = "Output";
 		final String SCOPE_I = "Input";
@@ -2142,13 +2438,14 @@ public class SimulinkStateflowPrinter extends ToolPrinter {
 
 		String arrSize;
 
-		assert(numRandMax > 0) : "One random number is always needed.";
+		assert (numRandMax > 0) : "One random number is always needed.";
 		arrSize = "[1, " + numRandMax + "]";
 		V_rand.setStandardProperties(SCOPE_I, UPDATE_C, DATATYPE_A, arrSize);
 		variables.add(V_rand);
 
 		// the following variables are only added if there are any transitions
-		if (numTransMax > 0) {
+		if (numTransMax > 0)
+		{
 			arrSize = "[1, " + numTransMax + "]";
 			V_transArray.setStandardProperties(SCOPE_L, UPDATE_D, DATATYPE_A, arrSize);
 			variables.add(V_transArray);
